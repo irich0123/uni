@@ -1,0 +1,389 @@
+{
+    "name" : "云加工",
+    "appid" : "__UNI__03F3211",
+    "description" : "",
+    "versionName" : "3.2.2",
+    "versionCode" : 3202,
+    "transformPx" : false,
+    /* 5+App特有相关 */
+    "app-plus" : {
+        "darkmode" : true,
+        "screenOrientation" : [ "portrait-primary" ],
+        "themeLocation" : "theme.json", // 如果 theme.json 在根目录可省略
+        "usingComponents" : true,
+        "nvueCompiler" : "uni-app",
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "nvue" : {
+            "flex-direction" : "row"
+        },
+        "optimization" : {
+            "subPackages" : true
+        },
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : false,
+            "waiting" : false,
+            "autoclose" : false,
+            "delay" : 0
+        },
+        /* 模块配置 */
+        "modules" : {
+            "OAuth" : {},
+            "Push" : {},
+            "Payment" : {},
+            "Share" : {},
+            "Camera" : {}
+        },
+        /* 应用发布信息 */
+        "distribute" : {
+            /* android打包配置 */
+            "android" : {
+                "permissions" : [
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ],
+                "minSdkVersion" : 23,
+                "abiFilters" : [ "arm64-v8a" ],
+                "targetSdkVersion" : 31
+            },
+            /* ios打包配置 */
+            "ios" : {
+                "dSYMs" : false,
+                "urltypes" : "joperateios",
+                "idfa" : true,
+                "privacyDescription" : {
+                    "NSUserTrackingUsageDescription" : "请放心，开启权限不会获取您在其他站点的隐私信息，该权限仅用于标识设备并保障服务安全与提示浏览体验"
+                }
+            },
+            /* "pushRegisterMode" : "manual"  *//* SDK配置 */
+            "sdkConfigs" : {
+                "ad" : {},
+                "push" : {},
+                "oauth" : {
+                    "weixin" : {
+                        "appid" : "wxfba299cffc7993ac",
+                        "UniversalLinks" : "https://web.yunjg.net/"
+                    },
+                    "apple" : {},
+                    "qq" : {
+                        "appid" : "102066677",
+                        "UniversalLinks" : "https://web.yunjg.net/"
+                    }
+                },
+                "payment" : {
+                    "appleiap" : {},
+                    "alipay" : {
+                        "__platform__" : [ "ios", "android" ]
+                    },
+                    "weixin" : {
+                        "__platform__" : [ "ios", "android" ],
+                        "appid" : "wxfba299cffc7993ac",
+                        "UniversalLinks" : "https://web.yunjg.net/"
+                    }
+                },
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wxfba299cffc7993ac",
+                        "UniversalLinks" : "https://web.yunjg.net/"
+                    },
+                    "qq" : {
+                        "appid" : "102066677",
+                        "UniversalLinks" : "https://web.yunjg.net/"
+                    }
+                }
+            },
+            "splashscreen" : {
+                "useOriginalMsgbox" : false,
+                "iosStyle" : "storyboard",
+                "ios" : {
+                    "storyboard" : "C:/work/牛了网络/项目/云加工/doc/ios.uni/storyboard/Chuxueyun_launchscreen2024051606a6.zip"
+                }
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
+                }
+            }
+        },
+        "safearea" : {
+            "background" : "#ffffff",
+            "backgroundDark" : "#000000", // HX 3.1.19+支持
+            "bottom" : {
+                "offset" : "none"
+            },
+            "left" : {
+                "offset" : "auto"
+            }
+        },
+        "runmode" : "liberate",
+        "nativePlugins" : {
+            "JG-JCore" : {
+                "JPUSH_APPKEY_ANDROID" : "abf5da087749ab2f9bdb7e53",
+                "JPUSH_APPKEY_IOS" : "abf5da087749ab2f9bdb7e53",
+                "JPUSH_CHANNEL_IOS" : "",
+                "JPUSH_CHANNEL_ANDROID" : "",
+                "__plugin_info__" : {
+                    "name" : "JG-JCore",
+                    "description" : "极光推送JCore插件",
+                    "platforms" : "Android,iOS",
+                    "url" : "",
+                    "android_package_name" : "com.niule.yunJiaGong",
+                    "ios_bundle_id" : "com.niule.yunJiaGongNew",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {
+                        "JPUSH_APPKEY_ANDROID" : {
+                            "des" : "[Android]极光 portal 配置应用信息时分配的 AppKey",
+                            "key" : "JPUSH_APPKEY",
+                            "value" : ""
+                        },
+                        "JPUSH_APPKEY_IOS" : {
+                            "des" : "[iOS]极光 portal 配置应用信息时分配的 AppKey",
+                            "key" : "JCore:APP_KEY",
+                            "value" : ""
+                        },
+                        "JPUSH_CHANNEL_IOS" : {
+                            "des" : "[iOS]用于统计分发渠道，不需要可填默认值 developer-default",
+                            "key" : "JCore:CHANNEL",
+                            "value" : ""
+                        },
+                        "JPUSH_CHANNEL_ANDROID" : {
+                            "des" : "[Android]用于统计分发渠道，不需要可填默认值 developer-default",
+                            "key" : "JPUSH_CHANNEL",
+                            "value" : ""
+                        }
+                    }
+                }
+            },
+            "JG-JPush" : {
+                "JPUSH_XIAOMI_APPKEY" : "5521769397468",
+                "JPUSH_MEIZU_APPID" : "",
+                "JPUSH_OPPO_APPSECRET" : "DA8136a528b7c27eb5fEa042E641A469",
+                "JPUSH_OPPO_APPKEY" : "3nRvla5S7Qkgwwk48sGwsGogg",
+                "JPUSH_ADVERTISINGID_IOS" : "",
+                "JPUSH_MEIZU_APPKEY" : "",
+                "JPUSH_OPPO_APPID" : "3623605",
+                "JPUSH_DEFAULTINITJPUSH_IOS" : "",
+                "JPUSH_VIVO_APPKEY" : "4debe6733dcc2be05c9728e03b121fbd",
+                "JPUSH_VIVO_APPID" : "100174219",
+                "JPUSH_ISPRODUCTION_IOS" : "",
+                "JPUSH_XIAOMI_APPID" : "2882303761517693468",
+                "JPUSH_HUAWEI_APPID" : "100186825",
+                "JPUSH_HONOR_APPID" : "900768529",
+                "JPUSH_GOOGLE_API_KEY" : "",
+                "JPUSH_GOOGLE_APP_ID" : "",
+                "JPUSH_GOOGLE_PROJECT_NUMBER" : "",
+                "JPUSH_GOOGLE_PROJECT_ID" : "",
+                "JPUSH_GOOGLE_STORAGE_BUCKET" : "",
+                "__plugin_info__" : {
+                    "name" : "JG-JPush",
+                    "description" : "极光推送Hbuilder插件",
+                    "platforms" : "Android,iOS",
+                    "url" : "",
+                    "android_package_name" : "com.niule.yunJiaGong",
+                    "ios_bundle_id" : "com.niule.yunJiaGongNew",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {
+                        "JPUSH_XIAOMI_APPKEY" : {
+                            "des" : "厂商 xiaomi appKey,示例：MI-12345678",
+                            "key" : "XIAOMI_APPKEY",
+                            "value" : ""
+                        },
+                        "JPUSH_MEIZU_APPID" : {
+                            "des" : "厂商 meizu appId,示例：MZ-12345678",
+                            "key" : "MEIZU_APPID",
+                            "value" : ""
+                        },
+                        "JPUSH_OPPO_APPSECRET" : {
+                            "des" : "厂商 oppo appSecret,示例：OP-12345678",
+                            "key" : "OPPO_APPSECRET",
+                            "value" : ""
+                        },
+                        "JPUSH_OPPO_APPKEY" : {
+                            "des" : "厂商 oppo appkey,示例：OP-12345678",
+                            "key" : "OPPO_APPKEY",
+                            "value" : ""
+                        },
+                        "JPUSH_ADVERTISINGID_IOS" : {
+                            "des" : "[iOS]广告标识符（IDFA） 如果不需要使用IDFA，可不填",
+                            "key" : "JPush:ADVERTISINGID",
+                            "value" : "IDFA"
+                        },
+                        "JPUSH_MEIZU_APPKEY" : {
+                            "des" : "厂商 meizu appKey,示例：MZ-12345678",
+                            "key" : "MEIZU_APPKEY",
+                            "value" : ""
+                        },
+                        "JPUSH_OPPO_APPID" : {
+                            "des" : "厂商 oppo appId,示例：OP-12345678",
+                            "key" : "OPPO_APPID",
+                            "value" : ""
+                        },
+                        "JPUSH_DEFAULTINITJPUSH_IOS" : {
+                            "des" : "[iOS]是否默认初始化，是填true，不是填false或者不填",
+                            "key" : "JPush:DEFAULTINITJPUSH",
+                            "value" : ""
+                        },
+                        "JPUSH_VIVO_APPKEY" : {
+                            "des" : "厂商 vivo appkey,示例：12345678",
+                            "key" : "com.vivo.push.api_key",
+                            "value" : ""
+                        },
+                        "JPUSH_VIVO_APPID" : {
+                            "des" : "厂商 vivo appId,示例：12345678",
+                            "key" : "com.vivo.push.app_id",
+                            "value" : ""
+                        },
+                        "JPUSH_ISPRODUCTION_IOS" : {
+                            "des" : "[iOS]是否是生产环境，是填true,不是填false或者不填",
+                            "key" : "JPush:ISPRODUCTION",
+                            "value" : ""
+                        },
+                        "JPUSH_XIAOMI_APPID" : {
+                            "des" : "厂商 xiaomi appId,示例：MI-12345678",
+                            "key" : "XIAOMI_APPID",
+                            "value" : ""
+                        },
+                        "JPUSH_HUAWEI_APPID" : {
+                            "des" : "厂商HUAWEI-appId,示例：appid=12346578",
+                            "key" : "com.huawei.hms.client.appid",
+                            "value" : ""
+                        },
+                        "JPUSH_HONOR_APPID" : {
+                            "des" : "厂商HONOR-appId,示例：12346578",
+                            "key" : "com.hihonor.push.app_id",
+                            "value" : ""
+                        },
+                        "JPUSH_GOOGLE_API_KEY" : {
+                            "des" : "厂商google api_key,示例:g-12346578",
+                            "key" : "google_api_key",
+                            "value" : ""
+                        },
+                        "JPUSH_GOOGLE_APP_ID" : {
+                            "des" : "厂商google mobilesdk_app_id,示例：g-12346578",
+                            "key" : "google_app_id",
+                            "value" : ""
+                        },
+                        "JPUSH_GOOGLE_PROJECT_NUMBER" : {
+                            "des" : "厂商google project_number,示例：g-12346578",
+                            "key" : "gcm_defaultSenderId",
+                            "value" : ""
+                        },
+                        "JPUSH_GOOGLE_PROJECT_ID" : {
+                            "des" : "厂商google project_id ,示例：g-12346578",
+                            "key" : "project_id",
+                            "value" : ""
+                        },
+                        "JPUSH_GOOGLE_STORAGE_BUCKET" : {
+                            "des" : "厂商google storage_bucket,示例：g-12346578",
+                            "key" : "google_storage_bucket",
+                            "value" : ""
+                        }
+                    }
+                }
+            },
+            "CGF-ExitIosApp" : {
+                "__plugin_info__" : {
+                    "name" : "ios退出应用",
+                    "description" : "plus.runtime.quit只能退出android,这个插件是退出ios的",
+                    "platforms" : "iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=695",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "com.niule.yunJiaGongNew",
+                    "isCloud" : true,
+                    "bought" : 1,
+                    "pid" : "695",
+                    "parameters" : {}
+                }
+            }
+        }
+    },
+    /* 快应用特有相关 */
+    "quickapp" : {},
+    /* 小程序特有相关 */
+    "mp-weixin" : {
+        "appid" : "wxc26652d327feb7b3",
+        "setting" : {
+            "urlCheck" : false
+        },
+        "optimization" : {
+            "subPackages" : true
+        },
+        "usingComponents" : true,
+        "lazyCodeLoading" : "requiredComponents"
+    },
+    "h5" : {
+        "title" : "云加工",
+        "appid" : "wxdded918741d63a55",
+        "template" : "template.h5.html",
+        "router" : {
+            "mode" : "hash",
+            "base" : "./"
+        },
+        "async" : {
+            "timeout" : 20000
+        }
+    },
+    "mp-alipay" : {
+        "usingComponents" : true
+    },
+    "mp-baidu" : {
+        "usingComponents" : true
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true
+    },
+    "uniStatistics" : {
+        "enable" : false
+    },
+    "vueVersion" : "2",
+    "locale" : "zh-Hans",
+    "fallbackLocale" : "zh-Hans"
+}

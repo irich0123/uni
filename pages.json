@@ -1,0 +1,770 @@
+{
+	"pages": [
+		{
+			"path": "pages/iosPrivacy/iosPrivacy", // 这个页面就是一个弹窗
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom", // 隐藏导航条
+				"disableSwipeBack": true, // 禁用侧滑返回
+				"app-plus": {
+					"animationType": "fade-in", // 弹窗进入方式
+					"popGesture": "none", // 关闭IOS屏幕左边滑动关闭当前页面的功能
+					"bounce": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/index/splash"
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "云加工",
+				"app-plus": {
+					"enablePullDownRefresh": true,
+					"pullToRefresh": {
+						"support": true,
+						"style": "circle",
+						"color": "@navBgColor"
+					}
+				},
+				"mp-weixin": {
+					"enablePullDownRefresh": true
+				},
+				"h5": {
+					"enablePullDownRefresh": false
+				}
+			}
+		},
+		{
+			"path": "pages/index/switch"
+		},
+		{
+			"path": "pages/wxCode/index"
+		},
+		{
+			"path": "pages/common/webview"
+		},
+		{
+			"path": "pages/chengjie/chengjie",
+			"style": {
+				"navigationBarTitleText": "承接"
+			}
+		},
+		{
+			"path": "pages/waifa/waifa",
+			"style": {
+				"navigationBarTitleText": "找外发"
+			}
+		},
+		{
+			"path": "pages/mall/mall",
+			"style": {
+				"navigationBarTitleText": "尾货通"
+			}
+		},
+		{
+			"path": "pages/personal/personal",
+			"style": {
+				"navigationBarTitleText": "个人中心",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"pullToRefresh": {
+						"support": true,
+						"style": "circle",
+						"color": "@navBgColor"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/personal/userInfo",
+			"style": {
+				"navigationBarTitleText": "个人资料",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/personal/myMarked",
+			"style": {
+				"navigationBarTitleText": "我的收藏"
+			}
+		},
+		{
+			"path": "pages/personal/mySubscribe",
+			"style": {
+				"navigationBarTitleText": "商机订阅"
+			}
+		},
+		{
+			"path": "pages/personal/myComplaint",
+			"style": {
+				"navigationBarTitleText": "我的投诉"
+			}
+		},
+		{
+			"path": "pages/personal/newComplaint",
+			"style": {
+				"navigationBarTitleText": "投诉"
+			}
+		},
+		{
+			"path": "pages/personal/complaintDetails",
+			"style": {
+				"navigationBarTitleText": "投诉详情"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/login/bindUser",
+			"style": {
+				"navigationBarTitleText": "绑定手机号"
+			}
+		}
+	],
+	"subPackages": [{
+			"root": "pagesNew",
+			"pages": [{
+					"path": "details/sendDetails",
+					"style": {
+						"navigationBarTitleText": "外发详情"
+					}
+				},
+				{
+					"path": "details/workDetails",
+					"style": {
+						"navigationBarTitleText": "承接详情"
+					}
+				},
+				{
+					"path": "details/mallDetails",
+					"style": {
+						"navigationBarTitleText": "商品详情"
+					}
+				},
+				{
+					"path": "domall/postCommodity",
+					"style": {
+						"navigationBarTitleText": "商品发布"
+					}
+				},
+				{
+					"path": "domall/boothCommodity",
+					"style": {
+						"navigationBarTitleText": "TA的商铺"
+					}
+				},
+				{
+					"path": "dosend/dosend",
+					"style": {
+						"navigationBarTitleText": "外发活发布"
+					}
+				},
+				{
+					"path": "dosend/searchReleaseWork",
+					"style": {
+						"navigationBarTitleText": "外发搜索"
+					}
+				},
+				{
+					"path": "dowork/dowork",
+					"style": {
+						"navigationBarTitleText": "承接信息发布"
+					}
+				},
+				{
+					"path": "dowork/searchWorkOrder",
+					"style": {
+						"navigationBarTitleText": "搜索承接"
+					}
+				},
+				{
+					"path": "details/otherUserInfo",
+					"style": {
+						"navigationBarTitleText": "用户详情"
+					}
+				},
+				{
+					"path": "domall/buyCommodity",
+					"style": {
+						"navigationBarTitleText": "购买商品"
+					}
+				},
+				{
+					"path": "domall/buyCommodityConfirm",
+					"style": {
+						"navigationBarTitleText": "商品购买确认"
+					}
+				},
+				{
+					"path": "domall/searchCommodity",
+					"style": {
+						"navigationBarTitleText": "商品搜索"
+					}
+				},
+				{
+					"path": "album/albumList",
+					"style": {
+						"navigationBarTitleText": "相册"
+					}
+				},
+				{
+					"path": "album/albumItemList",
+					"style": {
+						"navigationBarTitleText": "相册内容"
+					}
+				},
+				{
+					"path": "album/albumDetails",
+					"style": {
+						"navigationBarTitleText": "相册"
+					}
+				},
+				{
+					"path": "stick/stickList",
+					"style": {
+						"navigationBarTitleText": "置顶情况"
+					}
+				},
+				{
+					"path": "stick/stickApply",
+					"style": {
+						"navigationBarTitleText": "信息置顶"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesChoose",
+			"pages": [{
+					"path": "address/chooseAddress",
+					"style": {
+						"navigationBarTitleText": "地址选择",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "address/index",
+					"style": {
+						"navigationBarTitleText": "地址管理",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "address/addressDetails",
+					"style": {
+						"navigationBarTitleText": "地址",
+						"enablePullDownRefresh": true
+					}
+				},
+
+				{
+					"path": "city/cityIndex",
+					"style": {
+						"navigationBarTitleText": "城市选择",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "industry/industryIndex",
+					"style": {
+						"navigationBarTitleText": "更多行业"
+					}
+				},
+				{
+					"path": "clock/clock-in",
+					"style": {
+						"navigationBarTitleText": "签到"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesMore",
+			"pages": [{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "更多服务"
+					}
+				},
+				{
+					"path": "promotion/promotionList",
+					"style": {
+						"navigationBarTitleText": "活动"
+					}
+				},
+				{
+					"path": "message/messageList",
+					"style": {
+						"navigationBarTitleText": "我的消息"
+					}
+				},
+				{
+					"path": "advice/newAdvice",
+					"style": {
+						"navigationBarTitleText": "意见反馈"
+					}
+				},
+				{
+					"path": "service/serviceList",
+					"style": {
+						"navigationBarTitleText": "客服"
+					}
+				},
+				{
+					"path": "help/helpful",
+					"style": {
+						"navigationBarTitleText": "使用帮助"
+					}
+				},
+				{
+					"path": "help/helpInfo",
+					"style": {
+						"navigationBarTitleText": "帮助文档"
+					}
+				},
+				{
+					"path": "job/jobList",
+					"style": {
+						"navigationBarTitleText": "做任务 领金豆"
+					}
+				},
+				{
+					"path": "job/job-share",
+					"style": {
+						"navigationBarTitleText": "好心推广 赠送金豆"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesPersonal",
+			"pages": [{
+					"path": "card/activateCard",
+					"style": {
+						"navigationBarTitleText": "立即激活"
+					}
+				},
+				{
+					"path": "card/cardList",
+					"style": {
+						"navigationBarTitleText": "我的卡券"
+					}
+				},
+				{
+					"path": "bankCard/bankCardList",
+					"style": {
+						"navigationBarTitleText": "银行卡"
+					}
+				},
+				{
+					"path": "bankCard/bankCardInfo",
+					"style": {
+						"navigationBarTitleText": "银行卡"
+					}
+				},
+				{
+					"path": "contacted/contactedList",
+					"style": {
+						"navigationBarTitleText": "联系记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "goldBean/myGoldBean",
+					"style": {
+						"navigationBarTitleText": "我的金豆"
+					}
+				},
+				{
+					"path": "wallet/myWallet",
+					"style": {
+						"navigationBarTitleText": "钱包"
+					}
+				},
+				{
+					"path": "wallet/withDraw",
+					"style": {
+						"navigationBarTitleText": "提现"
+					}
+				},
+				{
+					"path": "wallet/myDeposit",
+					"style": {
+						"navigationBarTitleText": "保证金"
+					}
+				},
+				{
+					"path": "pay/payFund",
+					"style": {
+						"navigationBarTitleText": "余额充值"
+					}
+				},
+				{
+					"path": "pay/payCommodity",
+					"style": {
+						"navigationBarTitleText": "商品展示支付"
+					}
+				},
+				{
+					"path": "pay/payTransaction",
+					"style": {
+						"navigationBarTitleText": "商品结算"
+					}
+				},
+				{
+					"path": "pay/setPayPassword",
+					"style": {
+						"navigationBarTitleText": "支付密码"
+					}
+				},
+				{
+					"path": "pay/updatePayPassword",
+					"style": {
+						"navigationBarTitleText": "修改支付密码"
+					}
+				},
+				{
+					"path": "pay/paymentDeposit",
+					"style": {
+						"navigationBarTitleText": "缴纳保证金"
+					}
+				},
+				{
+					"path": "pay/payBeanGoods",
+					"style": {
+						"navigationBarTitleText": "金豆卡"
+					}
+				},
+				{
+					"path": "pay/payStickApply",
+					"style": {
+						"navigationBarTitleText": "置顶支付"
+					}
+				},
+				{
+					"path": "myWork/publishWork",
+					"style": {
+						"navigationBarTitleText": "我发的承接"
+					}
+				},
+				{
+					"path": "myReleaseWork/contactedWork",
+					"style": {
+						"navigationBarTitleText": "承接联系"
+					}
+				},
+				{
+					"path": "myWork/transactionWork",
+					"style": {
+						"navigationBarTitleText": "接单交易"
+					}
+				},
+				{
+					"path": "myReleaseWork/publishReleaseWork",
+					"style": {
+						"navigationBarTitleText": "我发的活"
+					}
+				},
+				{
+					"path": "myWork/contactedReleaseWork",
+					"style": {
+						"navigationBarTitleText": "外发商机"
+					}
+				},
+				{
+					"path": "myReleaseWork/transactionReleaseWork",
+					"style": {
+						"navigationBarTitleText": "发单交易"
+					}
+				},
+				{
+					"path": "myMall/publishMall",
+					"style": {
+						"navigationBarTitleText": "我的商品"
+					}
+				},
+				{
+					"path": "myMall/myCommodityBuyTransaction",
+					"style": {
+						"navigationBarTitleText": "我的采购订单"
+					}
+				},
+				{
+					"path": "myMall/myCommoditySellTransaction",
+					"style": {
+						"navigationBarTitleText": "我的销售订单"
+					}
+				},
+				{
+					"path": "myMall/commodityExtend",
+					"style": {
+						"navigationBarTitleText": "商品展期"
+					}
+				},
+				{
+					"path": "myMall/transactionDetailsForBuyer",
+					"style": {
+						"navigationBarTitleText": "交易详情"
+					}
+				},
+				{
+					"path": "myMall/transactionDetailsForSeller",
+					"style": {
+						"navigationBarTitleText": "交易详情"
+					}
+				},
+				{
+					"path": "myMall/negoTransaction",
+					"style": {
+						"navigationBarTitleText": "取消订单"
+					}
+				},
+				{
+					"path": "myMall/confirmTransaction",
+					"style": {
+						"navigationBarTitleText": "订单确认"
+					}
+				},
+				{
+					"path": "myMall/dispute",
+					"style": {
+						"navigationBarTitleText": "交易争议",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "myMall/newDispute",
+					"style": {
+						"navigationBarTitleText": "新争议"
+					}
+				},
+				{
+					"path": "myStick/stick-apply-list",
+					"style": {
+						"navigationBarTitleText": "置顶信息"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesOffer",
+			"pages": [{
+					"path": "offer/newOffer",
+					"style": {
+						"navigationBarTitleText": "报价"
+					}
+				},
+				{
+					"path": "offer/offerList",
+					"style": {
+						"navigationBarTitleText": "查看报价",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "offer/offerDetailsByPoster",
+					"style": {
+						"navigationBarTitleText": "报价详情"
+					}
+				},
+				{
+					"path": "contract/signContract",
+					"style": {
+						"navigationBarTitleText": "签订合同"
+					}
+				},
+				{
+					"path": "contract/contractDetails",
+					"style": {
+						"navigationBarTitleText": "合同",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "contract/transactionDetails",
+					"style": {
+						"navigationBarTitleText": "交易详情"
+					}
+				},
+				{
+					"path": "contract/cancelReason",
+					"style": {
+						"navigationBarTitleText": "取消交易"
+					}
+				},
+				{
+					"path": "contract/applyPostpone",
+					"style": {
+						"navigationBarTitleText": "申请延期"
+					}
+				},
+				{
+					"path": "contract/applyArbitration",
+					"style": {
+						"navigationBarTitleText": "申请仲裁"
+					}
+				},
+				{
+					"path": "contract/evaluate",
+					"style": {
+						"navigationBarTitleText": "评价"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesCertification",
+			"pages": [{
+					"path": "personal/index",
+					"style": {
+						"navigationBarTitleText": "个人认证"
+					}
+				},
+				{
+					"path": "enterprise/index",
+					"style": {
+						"navigationBarTitleText": "企业认证"
+					}
+				},
+				{
+					"path": "enterprise/enterpriseList",
+					"style": {
+						"navigationBarTitleText": "企业展台"
+					}
+				},
+				{
+					"path": "enterprise/enterpriseEdit",
+					"style": {
+						"navigationBarTitleText": "企业编辑"
+					}
+				},
+				{
+					"path": "enterprise/enterpriseDetails",
+					"style": {
+						"navigationBarTitleText": "企业展台"
+					}
+				},
+				{
+					"path": "enterprise/albumShow",
+					"style": {
+						"navigationBarTitleText": "企业相册"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesAdmin",
+			"pages": [{
+					"path": "admin/index",
+					"style": {
+						"navigationBarTitleText": "审核管理"
+					}
+				},
+				{
+					"path": "admin/audit-release-work",
+					"style": {
+						"navigationBarTitleText": "外发信息审核"
+					}
+				},
+				{
+					"path": "admin/audit-work-order",
+					"style": {
+						"navigationBarTitleText": "承接信息审核"
+					}
+				},
+				{
+					"path": "admin/cert-personal",
+					"style": {
+						"navigationBarTitleText": "个人认证审核"
+					}
+				},
+				{
+					"path": "admin/cert-company",
+					"style": {
+						"navigationBarTitleText": "企业认证审核"
+					}
+				},
+				{
+					"path": "admin/audit-commodity",
+					"style": {
+						"navigationBarTitleText": "商品审核"
+					}
+				}
+			]
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "云加工",
+		"navigationBarBackgroundColor": "#FB5318",
+		"h5": {
+			"navigationStyle": "custom", //测试时，注销这行
+			"titleNView": {
+				"backgroundColor": "#fb5318"
+			},
+			"pullToRefresh": {
+				"color": "#fb5318"
+			}
+		},
+		"mp-weixin": {
+			"navigationStyle": "custom"
+		},
+		"app-plus": {
+			"titleNView": false
+		}
+	},
+	"tabBar": {
+		"color": "@tabTxtColor",
+		"backgroundColor": "@tabBgColor",
+		"selectedColor": "@tabSelTxtColor",
+		"borderStyle": "@tabBorderStyle",
+		"list": [{
+				"text": "云加工",
+				"pagePath": "pages/index/index",
+				"iconPath": "static/images/tabimg/index.png",
+				"selectedIconPath": "static/images/tabimg/index-select.png"
+			},
+			{
+				"text": "外发",
+				"pagePath": "pages/waifa/waifa",
+				"iconPath": "static/images/tabimg/zhaohuo.png",
+				"selectedIconPath": "static/images/tabimg/zhaohuo-select.png"
+			},
+			{
+				"text": "承接",
+				"pagePath": "pages/chengjie/chengjie",
+				"iconPath": "static/images/tabimg/chengjie.png",
+				"selectedIconPath": "static/images/tabimg/chengjie-select.png"
+			},
+			{
+				"text": "尾货通",
+				"pagePath": "pages/mall/mall",
+				"iconPath": "static/images/tabimg/ic_cart_no.png",
+				"selectedIconPath": "static/images/tabimg/ic_cart_yes.png"
+			},
+			{
+				"text": "我的",
+				"pagePath": "pages/personal/personal",
+				"iconPath": "static/images/tabimg/my.png",
+				"selectedIconPath": "static/images/tabimg/my-select.png"
+			}
+		]
+	},
+	"uniIdRouter": {},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
+	}
+
+}

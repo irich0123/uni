@@ -1,0 +1,16 @@
+
+::v-deep .wuc-tab-item {
+    margin: 0 10rpx;
+    padding: 0;
+}
+
+::v-deep .wuc-tab {
+	position: fixed;
+	left: 0;
+	width: 100%;
+	height: 80rpx;
+	z-index: 9;
+}
+
+
+

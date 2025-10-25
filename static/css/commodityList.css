@@ -1,0 +1,126 @@
+/*商品cell开始*/
+.commodity-box {
+    font-size: 28rpx;
+    margin: 0 10rpx;
+}
+
+.commodity-item {
+    background-color: #fff;
+    padding: 30rpx 30rpx;
+    margin: 20rpx 0 0 0;
+    border-radius: 15rpx;
+    box-shadow: 0 0 30rpx #e7e7e7;
+}
+
+.item-title-line {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding-bottom: 10rpx;
+    border-bottom: 2rpx solid #e0e0e0;
+}
+
+.item-title-line-left {
+    color: #666666;
+    font-size: 26rpx;
+}
+
+.item-title-line-right {
+    border-bottom: 1px solid #ff5100;
+    margin-left: auto;
+    font-size: 26rpx;
+}
+
+.item-content-box {
+    padding: 20rpx 0 20rpx 0;
+    display: flex;
+    flex-flow: row;
+}
+
+.item-content-image {
+    width: 160rpx;
+    height: 160rpx;
+    min-width: 160rpx;
+    border-radius: 10rpx;
+    margin-right: 20rpx;
+    margin-top: 8rpx;
+}
+
+.item-content-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 10rpx;
+}
+
+.item-content-info {
+    margin-left: 20rpx;
+    font-size: 24rpx;
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+}
+
+.details-title {
+    color: #333;
+    overflow: hidden;
+    line-height: 1.5;
+    margin-bottom: 10rpx;
+    font-size: 32rpx;
+    min-height: 80rpx;
+    font-weight: bold;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    white-space: normal !important;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.details-number {
+    font-size: 26rpx;
+    line-height: 1.5;
+}
+
+.overflow_box {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    overflow-x: scroll;
+    font-size: 24rpx;
+    color: #555555;
+    display: -webkit-box;
+}
+
+.overflow_price {
+    width: auto;
+    text-align: start;
+    padding: 0 20rpx 0 20rpx;
+    border-right: 2rpx solid #cccccc;
+}
+
+.overflow_price:first-child {
+    padding-left: 0;
+}
+
+.overflow_price:last-child {
+    border-right: none;
+}
+
+.item-footer-line {
+    font-size: 26rpx;
+    color: #999;
+    padding-top: 10rpx;
+    margin-top: 20rpx;
+    border-top: 2rpx solid #e0e0e0;
+    display: flex;
+    flex-flow: row;
+}
+
+.item-footer-left {
+}
+
+.item-footer-right {
+    margin-left: auto;
+}
+/*商品cell结束*/

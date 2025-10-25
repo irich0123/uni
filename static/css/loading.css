@@ -1,0 +1,15 @@
+	.loading-text {
+		padding-top: 20rpx;
+		/* #ifdef H5 */
+		padding-bottom: 60rpx;
+		/* #endif */
+		/* #ifndef H5 */
+		padding-bottom: 20rpx;
+		/* #endif */
+		font-size: 26rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		color: #999999;
+	}

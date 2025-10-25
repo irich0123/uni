@@ -1,0 +1,72 @@
+/*分享提示样式*/
+::v-deep .notice_popup {
+	z-index: 9999;
+}
+
+.notice_popup ::v-deep .uni-popup__wrapper-box {
+	width: 90%;
+	border-radius: 20rpx;
+	background-color: white;
+	text-align: center;
+}
+
+.notice_popup_title {
+	font-size: 32rpx;
+	padding: 30rpx 40rpx 20rpx 40rpx;
+	text-align: center;
+}
+
+.notice_popup_line {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 28rpx;
+	border: 2rpx solid #eeeeee;
+	border-bottom: 0;
+	margin: 0 20px;
+	line-height: 80rpx;
+}
+
+/* 下面是顶部tips展示 */
+::v-deep .uni-notice-bar {
+	width: 100%;
+}
+
+.top-notify-tips {
+	z-index: 9;
+	height: 200rpx;
+	position: fixed;
+	display: flow-root !important;
+	margin-top: 0;
+
+	/* #ifdef H5  */
+	top: 80rpx !important;
+	/* #endif */
+}
+
+.debug-top-notify-tips {
+	margin-top: 80rpx;
+}
+
+::v-deep .uni-noticebar {
+	z-index: 999;
+	position: fixed;
+}
+
+::v-deep .uni-noticebar__content-text {
+	height: 60rpx !important;
+	line-height: 60rpx !important;
+	font-size: 24rpx !important;
+}
+
+::v-deep .uni-noticebar__more-text {
+	font-size: 24rpx !important;
+	height: 50rpx;
+	line-height: 50rpx;
+	width: 80rpx;
+	text-align: center;
+	color: #ff5100;
+	border: 1px solid #ff5100;
+	border-radius: 40rpx;
+}

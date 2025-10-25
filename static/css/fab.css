@@ -1,0 +1,12 @@
+::v-deep .fab-circle-h {
+    background: #ff510088;
+}
+
+::v-deep .fab-circle-v {
+    background: #ff510088;
+}
+
+::v-deep .uni-fab__content--other-platform {
+    box-shadow: 0 0 5px 5px rgb(255 81 0 / 10%);
+    border: 1rpx solid #ff510011;
+}

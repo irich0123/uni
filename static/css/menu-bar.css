@@ -1,0 +1,58 @@
+/* 选项卡 开始 */
+.tab-choose {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 80rpx;
+	z-index: 9;
+}
+
+.debug-tab-choose {
+	/* #ifdef H5 */
+	top: 88rpx;
+	/* #endif */
+	/* #ifndef H5 */
+	top: 0;
+	/* #endif */
+}
+
+
+.tab-item-img {
+	width: 22rpx;
+	height: 11rpx;
+	padding: 0 10rpx;
+
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+	justify-content: center;
+}
+/* 选项卡 结束*/
+
+/* 菜单 开始*/
+.cover {
+	height: 100vh;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.1);
+	z-index: 8;
+}
+
+.show {
+	display: block;
+}
+
+.hide {
+	display: none;
+}
+
+.industry-item-img {
+	width: 44rpx;
+	height: 44rpx;
+}
+
+
+/* 菜单 结束*/

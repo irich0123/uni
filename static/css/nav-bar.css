@@ -1,0 +1,21 @@
+.custom-nav-bar {}
+
+.nav-right-btn {
+	padding: 20rpx 10rpx;
+}
+
+.nav-right-image-box {
+	width: 44rpx;
+	height: 44rpx;
+	padding: 20rpx 10rpx;
+}
+
+.nav-right-image-box image {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.nav-left-btn {
+	padding: 20rpx 10rpx;
+}
