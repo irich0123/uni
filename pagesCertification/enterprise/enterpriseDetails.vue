@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll" v-if="enterpriseData">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="企业展台" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="企业展台" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<view :style="'padding-top:'+contentTop+'px;'">

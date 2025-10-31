@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar :title="title" @action="navAction" @reSize="reSize" />
+		<my-nav-bar :title="title" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view class="bg-gray-1" scroll-y :style="'padding-top:'+ contentTop +'px;height:'+listHeight+'px;'"
@@ -22,7 +22,7 @@
 					</view>
 					<view v-else>
 						<view class="bg-white gray-border radius flex flex-direction align-center justify-center"
-							style="width:200rpx;height:200rpx" @click.stop="onPlus(index)">
+							style="width:200rpx;height:200rpx" @click.stop="beforeSelectImage">
 							<uni-icons size="40" type="plusempty" color="#999999"></uni-icons>
 						</view>
 					</view>
@@ -60,6 +60,12 @@
 	import {
 		active
 	} from '@/utils/config';
+	//#ifdef APP-PLUS
+	import {
+		checkCamera,
+		checkAlbum
+	} from '@/utils/android_permission.js'
+	//#endif
 	
 	export default {
 		name: "enterpriseAlbum",
@@ -232,29 +238,87 @@
 					self.isLoading = false;
 				});
 			},
-			onPlus() { //点击了加号
-				let self = this
-				uni.showActionSheet({
-					itemList: ['从相册中选择', '拍照'],
-					itemColor: '#fb5318',
-					success: function(res) {
-						if (res.tapIndex === 0) {
-							self.chooseImageShop('album')
-						} else if (res.tapIndex === 1) {
-							self.chooseImageShop('camera')
+			beforeSelectImage() {
+				//#ifndef APP-PLUS
+				this.selectImage();
+				//#endif
+				//#ifdef APP-PLUS
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					this.selectImage();
+				} else if (platform === 'android') {
+					let self = this;
+					uni.showActionSheet({
+						itemList: ['拍摄', '从相册选择'],
+						success: function(res) {
+							if (res.tapIndex === 0) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.camera) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传相册照片时，需要调用摄像头拍照功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkCamera()) {
+													self.selectImage(["camera"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.camera === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的摄像头功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.camera === 1) {
+									self.selectImage(['camera']);
+								}
+							} else if (res.tapIndex === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.storage) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传相册照片时，需要调用您的本地存储功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkAlbum()) {
+													self.selectImage(["album"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.storage === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的本地存储功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.storage === 1) {
+									self.selectImage(['album']);
+								}
+							}
 						}
-					},
-					fail: function(res) {}
-				});
+					})
+				}
+				//#endif
 			},
-			//从相册中选择
-			chooseImageShop(type) {
+
+			selectImage(sourceType) {
+				if (!sourceType) {
+					sourceType = ['album', 'camera'];
+				}
 				let self = this
 				uni.chooseImage({
 					count: this.imgLengthMax - this.list.length, //默认9
-					// sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 					sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
-					sourceType: [type], //从相册选择还是拍照
+					sourceType: sourceType, //从相册选择还是拍照
 					success: function(res) {
 						let filePathArray = res.tempFilePaths
 						let fileArray = res.tempFiles
@@ -267,6 +331,25 @@
 						}
 						// #endif
 						self.handleEachFile(filePathArray, fileArray)
+					},
+					fail: function(res) {
+						//#ifdef APP-PLUS
+						console.log(res);
+						if (res.errMsg.indexOf("No Permission") > -1) {
+							if (sourceType.length === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission) {
+									permission = {};
+								}
+								if (sourceType[0] === 'album') {
+									permission.storage = 0;
+								}else if(sourceType[0] === 'camera'){
+									permission.camera = 0;
+								}
+								uni.setStorageSync("permission",permission);
+							}
+						}
+						//#endif
 					}
 				});
 			},

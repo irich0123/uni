@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="入驻企业" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="入驻企业" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view class="bg-gray-1" scroll-y :style="'padding-top:'+ contentTop +'px;height:'+listHeight+'px;'"

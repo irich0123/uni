@@ -1869,6 +1869,14 @@ button.cuIcon.lg {
 	/* #endif */
 }
 
+.my-nav-bar {
+	z-index: 99;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
 /* #ifdef APP-PLUS  */
 @media (prefers-color-scheme: dark) {
 

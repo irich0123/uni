@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="领任务" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="领任务" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -182,7 +182,7 @@
 			},
 			toDetail(task) {
 				if (task.type === 1) { //每日任务
-					if (task.toUrl.indexOf("http:") > -1) {
+					if (task.toUrl.indexOf("http") > -1) {
 						//todo 小程序和公众号分享 及APP分享功能
 						uni.navigateTo({
 							url: '/pages/common/webview?url=' + encodeURIComponent(task.toUrl + "?t=" + new Date().getTime()),

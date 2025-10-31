@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="我的商品" @action="navAction" @reSize="reSize"
+		<my-nav-bar title="我的商品" @action="navAction" @reSize="reSize" class="my-nav-bar"
 			:img-btn-src1="imgUrl+'/ic_edit_hollow_white.png'" />
 		<!-- #endif -->
 

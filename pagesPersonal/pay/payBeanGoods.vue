@@ -1,7 +1,7 @@
 <template>
 	<view class="container flex flex-direction no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="购买金豆卡" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="购买金豆卡" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -93,7 +93,8 @@
 	} from "@/api/finance";
 	import {
 		payWayConfig,
-		imgUrl,active
+		imgUrl,
+		active
 	} from '@/utils/config.js';
 	import {
 		Iap,
@@ -218,7 +219,9 @@
 			}).active = true;
 			// #endif
 
+
 			// #ifdef APP-PLUS
+			this.platform = uni.getStorageSync("platform");
 			if (this.platform == "ios") {
 				this.payWayConfig.find(v => {
 					return v.key === 'ios-iap'
@@ -233,7 +236,6 @@
 			}
 			// #endif
 
-			this.platform = uni.getSystemInfoSync().osName;
 
 			this.initData();
 		},
@@ -570,7 +572,8 @@
 											}
 										})
 									}
-								} else if (self.payWayList[self.payTypeIndex].payType === 2) { //支付宝APP支付
+								} else if (self.payWayList[self.payTypeIndex].payType ===
+									2) { //支付宝APP支付
 									const aliChannel = res.providers.find((channel) => {
 										return (channel.id === 'alipay')
 									})

@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="请登录" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="请登录" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -88,8 +88,12 @@
 	import {
 		regex,
 		imgUrl,
-		webUrl,active
+		webUrl,
+		active
 	} from "@/utils/config";
+	import {
+		queryAppBasic
+	} from '@/api/common.js'
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
 	// #endif
@@ -115,15 +119,8 @@
 
 				btnDisabled: true,
 
-				linkList: [{
-						"url": webUrl + '/useragreement/index.html?t=' + new Date().getTime(),
-						"name": '用户协议',
-					},
-					{
-						"url": webUrl + '/privacy/index.html?t=' + new Date().getTime(),
-						"name": '隐私政策',
-					},
-				],
+				appBasic: {},
+				linkList: [],
 				wechat: false,
 				qq: false,
 
@@ -181,7 +178,7 @@
 		},
 		onLoad() {
 			// #ifdef APP-PLUS
-			this.platform = uni.getSystemInfoSync().platform;
+			this.platform = uni.getStorageSync("platform");
 
 			this.theme = uni.getStorageSync("theme");
 			uni.onThemeChange((res) => {
@@ -217,7 +214,33 @@
 				this.$forceUpdate();
 			},
 			initData() {
-				this.getLoginType();
+				this.loadAppInfo();
+			},
+			loadAppInfo() {
+				var self = this;
+				queryAppBasic({}).then(res => {
+					if (res.retCode === 0 && res.data.length > 0) {
+						self.appBasic = res.data[0];
+
+						self.linkList.splice(0, self.linkList.length);
+						if (self.appBasic.userProtocolUrl) {
+							self.linkList.push({
+								name: '用户服务协议',
+								url: webUrl + self.appBasic.userProtocolUrl + "?t=" + new Date().getTime(),
+								type: 0,
+							})
+						}
+
+						if (self.appBasic.privacyUrl) {
+							self.linkList.push({
+								name: '隐私政策',
+								url: webUrl + self.appBasic.privacyUrl + "?t=" + new Date().getTime(),
+								type: 1,
+							})
+						}
+						self.getLoginType();
+					}
+				});
 			},
 			getLoginType() {
 				let self = this;
@@ -236,7 +259,6 @@
 
 				let currentTime = this.currentTime;
 
-				console.log(this.username)
 				if (this.username === '' || !(new RegExp(regex.mobile)).test(this.username)) {
 					uni.showToast({
 						icon: "none",
@@ -335,10 +357,14 @@
 				});
 			},
 			toWebView(index) {
-				uni.navigateTo({
-					url: '/pages/common/webview?url=' + encodeURIComponent(this.linkList[index].url) + '&name=' +
-						encodeURIComponent(this.linkList[index].name),
-				})
+				let [obj] = this.linkList.filter(v => v.type === index);
+				if (!!obj) {
+					uni.navigateTo({
+						url: '/pages/common/webview?url=' + encodeURIComponent(obj.url) +
+							'&title=' +
+							encodeURIComponent(obj.name),
+					})
+				}
 			},
 			oauth(provider) {
 				if (!this.isAgree) {
@@ -354,14 +380,12 @@
 				uni.getProvider({
 					service: 'oauth',
 					success: function(res) {
-						console.log(res);
 						if (~res.provider.indexOf(provider)) {
 							if (provider === "weixin") {
 								uni.login({
 									provider: provider,
 									onlyAuthorize: true,
 									success: function(event) {
-										console.log(JSON.stringify(event));
 										self.getWxOpenIdByCode(event.code);
 									}
 								});
@@ -369,15 +393,16 @@
 								uni.login({
 									provider: provider,
 									success: function(loginRes) {
-										console.log(JSON.stringify(loginRes));
 										uni.getUserInfo({
 											provider: provider,
 											success: function(info) {
-												console.log("info:", info)
 												// 获取用户信息成功, info.authResult保存用户信息
-												self.thirdPartyLogin(provider, info
-													.userInfo.openid, info.userInfo
-													.nickName, info.userInfo
+												self.thirdPartyLogin(provider,
+													info
+													.userInfo.openid, info
+													.userInfo
+													.nickName, info
+													.userInfo
 													.headimgurl)
 											}
 										})
@@ -392,7 +417,6 @@
 								uni.login({
 									provider: provider,
 									success: function(event) {
-										// console.log(JSON.stringify(appleInfo));
 										self.getAppleUserInfo(provider);
 									}
 								});
@@ -463,7 +487,6 @@
 				uni.getUserInfo({
 					provider: 'apple',
 					success: function(info) {
-						console.log("info=", info);
 						if (info.errMsg.indexOf(":ok") > -1) {
 							// 获取用户信息成功, info.authResult中保存登录认证数据
 							self.iosUserVerify(provider, info.userInfo);

@@ -54,11 +54,12 @@
 			}
 		},
 		mounted() {
-			this.advertiseList = uni.getStorageSync("advertList");
+			let advertiseList = uni.getStorageSync("advertList");
 
-			if (!this.advertiseList || this.advertiseList.length === 0) {
+			if (!advertiseList || advertiseList.length === 0) {
 				this.getAdvertList();
 			} else {
+				this.advertiseList = advertiseList;
 				this.getAdvertVersionCode();
 			}
 		},

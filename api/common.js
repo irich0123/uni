@@ -369,4 +369,14 @@ export const queryAdverInfo = (params) => {
 }
 
 
+/////////////////APP BASIC///////////////////////////////
+
+
+export const queryAppBasic = (param) => {
+    return myRequest({
+        url: '/commonapi/app/basic/query',
+        method: 'POST',
+        data: param
+    })
+}
 

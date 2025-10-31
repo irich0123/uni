@@ -320,7 +320,6 @@
 						});
 					});
 					let i = 0;
-					console.log("this.industryId==", this.industryId);
 					if (!!this.industryId) {
 						i = this.menuList[idx].menuItems.findIndex(v => {
 							return v.value === this.industryId;

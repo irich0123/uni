@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="更多服务" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="更多服务" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -21,7 +21,7 @@
 
 				<!-- #ifdef APP-PLUS -->
 				<uni-list>
-					<uni-list-item title="推送设置" :show-arrow="true" @click.native="toPushConfig" />
+					<uni-list-item title="通知设置" :show-arrow="true" @click.native="toPushConfig" />
 				</uni-list>
 				<!-- #endif -->
 			</view>
@@ -32,15 +32,47 @@
 					退出登录
 				</view>
 			</view>
+			<!-- #ifdef APP-PLUS  -->
+			<view class='margin-tb margin-lr-sm flex' v-if="withCancel">
+				<view class='flex-grow flex align-center justify-center text-xl bg-white text-gray-1 text-bold radius-l'
+					style="min-height:100rpx" v-if="!!token" @click="logoff">
+					注销账号
+				</view>
+			</view>
+			<!-- #endif -->
 		</scroll-view>
+
+		<!-- #ifdef APP-PLUS  -->
+		<view class="cu-modal" :class="modalName=='msgDialog'?'show':''">
+			<view class="cu-dialog bg-white">
+				<view class="flex justify-center padding-tb-df gray-border-bottom">
+					<view class="text-theme text-sm">系统提示</view>
+				</view>
+				<view class="padding-xl text-sm text-black-4 gray-border-bottom text-left" style="line-height: 42upx;">
+					警告！！此为不可逆操作！！与退出登录不同，注销帐户后，系统将不再保存您的任何个人信息，您将不能登录原有的帐户，所有过往发布和查看的信息，以及财务等信息将不再可访问！此手机号将在1年内再次注册受限！确认要注销帐户吗？
+				</view>
+				<view class="flex text-sm">
+					<view class="flex-sub text-gray-2 padding-tb-df text-center" @tap="hideModal">取消</view>
+					<view class="flex-sub text-theme padding-tb-df gray-border-left text-medium text-center"
+						@tap="tologoff">确定</view>
+				</view>
+			</view>
+		</view>
+		<!-- #endif -->
 	</view>
 </template>
 
 <script>
+	// #ifdef APP-PLUS
+	let jpushModule = uni.requireNativePlugin("JG-JPush");
+	// #endif
+
 	import UniListItem from "@/components/uni-list-item/uni-list-item";
 	import UniList from "@/components/uni-list/uni-list";
 	import {
-		userLogout
+		userLogout,
+		userCancelCheck,
+		userLogoff
 	} from '@/api/user';
 
 	import {
@@ -52,12 +84,7 @@
 	import {
 		active
 	} from "@/utils/config";
-	
-	// #ifdef APP-PLUS 
-	import {
-		gotoAppPermissionSetting
-	} from "@/js_sdk/wa-permission/permission.js";
-	// #endif
+
 
 	export default {
 		name: "moreServiceIndex",
@@ -78,6 +105,9 @@
 				listHeight: 0,
 
 				webUrl: webUrl,
+
+				withCancel: true,
+				modalName: null,
 			}
 		},
 		watch: {
@@ -97,13 +127,12 @@
 		onLoad() {
 			this.token = uni.getStorageSync('token');
 			this.userData = uni.getStorageSync("user");
+
+			//#ifdef APP-PLUS
+			this.intiData();
+			//#endif
 		},
-		onShow() {
-			if (!!uni.getStorageSync("needRefresh")) {
-				uni.removeStorageSync("needRefresh");
-				this.initData();
-			}
-		},
+		onShow() {},
 		methods: {
 			navAction(e) {
 				if (e.action === 'back') {
@@ -115,14 +144,26 @@
 			reSize(e) {
 				this.statusbarHeight = e.value;
 			},
-
+			intiData() {
+				if (!!this.token) {
+					this.checkCancelUser()
+				}
+			},
+			checkCancelUser() {
+				let self = this;
+				userCancelCheck({}).then(res => {
+					if (res.retCode === 0) {
+						self.withCancel = res.data;
+					}
+				});
+			},
 			toNotify() {
 				uni.navigateTo({
 					url: '/pagesMore/message/messageList',
 				})
 			},
 			toPushConfig() {
-				gotoAppPermissionSetting();
+				uni.openAppAuthorizeSetting();
 			},
 			toPromotionList() {
 				uni.navigateTo({
@@ -146,8 +187,7 @@
 			},
 			toAboutUs() {
 				uni.navigateTo({
-					url: '/pages/common/webview?url=' + encodeURIComponent(this.webUrl + "/aboutus/index.html?t=" +
-						new Date().getTime()),
+					url: '/pagesMore/aboutus',
 				})
 			},
 			toService() {
@@ -169,7 +209,6 @@
 									if (res.retCode === 0) {
 										uni.removeStorageSync('token');
 										uni.removeStorageSync('user');
-										uni.removeStorageSync('deviceInfo');
 										self.token = null;
 										self.userData = {}
 										uni.showToast({
@@ -182,7 +221,6 @@
 							} else {
 								uni.removeStorageSync('token')
 								uni.removeStorageSync('user')
-								uni.removeStorageSync('deviceInfo');
 								self.token = null;
 								self.userData = {}
 							}
@@ -190,6 +228,35 @@
 					}
 				})
 			},
+			logoff() {
+				this.modalName = 'msgDialog';
+			},
+			tologoff() {
+				var self = this;
+				self.modalName = null;
+				userLogoff({}).then(res => {
+					if (res.retCode === 0) {
+						// #ifdef APP-PLUS
+						jpushModule.deleteAlias({
+							'sequence': 1
+						})
+						// #endif
+						setTimeout(() => {
+							uni.removeStorageSync('token');
+							uni.removeStorageSync('user');
+							self.token = null;
+							self.userData = {}
+							uni.switchTab({
+								url: '/pages/index/index'
+							})
+						}, 1000);
+					}
+				});
+			},
+			hideModal(e) {
+				this.modalName = null
+			},
+
 		}
 	}
 </script>

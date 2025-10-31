@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="合同内容" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="合同内容" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<!--        外发活基本信息开始-->

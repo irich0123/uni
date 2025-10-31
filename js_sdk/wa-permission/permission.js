@@ -177,6 +177,7 @@ function requestAndroidPermission(permissionID) {
 					console.log('永久拒绝申请的权限：' + deniedAlwaysPermission);
 					result = -1
 				}
+				
 				resolve(result);
 				// 若所需权限被拒绝,则打开APP设置界面,可以在APP设置界面打开相应权限
 				// if (result != 1) {

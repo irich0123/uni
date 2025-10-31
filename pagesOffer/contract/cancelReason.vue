@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="取消原因" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="取消原因" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">

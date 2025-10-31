@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="我发的外发" @action="navAction" @reSize="reSize"
+		<my-nav-bar title="我发的外发" @action="navAction" @reSize="reSize" class="my-nav-bar"
 			:img-btn-src1="imgUrl+'/ic_edit_hollow_white.png'" />
 		<!-- #endif -->
 
@@ -9,9 +9,9 @@
 			:style="'padding-top:'+contentTop+'px;'" select-class="text-theme"></wuc-tab>
 
 		<!--        信息列表开始-->
-		<scroll-view class="bg-gray-1" scroll-y :style="'height:'+listHeight+'px;'"
-			@scrolltolower="loadMoreData" refresher-enabled="true" :refresher-triggered="triggered"
-			@refresherrefresh="onRefresh" @refresherrestore="onRestore" refresher-background="transparent">
+		<scroll-view class="bg-gray-1" scroll-y :style="'height:'+listHeight+'px;'" @scrolltolower="loadMoreData"
+			refresher-enabled="true" :refresher-triggered="triggered" @refresherrefresh="onRefresh"
+			@refresherrestore="onRestore" refresher-background="transparent">
 			<!--列表开始-->
 			<uni-swipe-action>
 				<uni-list :border="false">
@@ -108,7 +108,8 @@
 		getReleaseWorkStatusEnum
 	} from "@/api/basic";
 	import {
-		imgUrl,active
+		imgUrl,
+		active
 	} from '@/utils/config.js';
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
@@ -223,8 +224,14 @@
 			this.userData = uni.getStorageSync("user");
 
 			let o = options.o
+			let tab = options.tab
+			if (tab === null || tab === undefined) {
+				tab = 1
+			}else{
+				tab = parseInt(tab);
+			}
 			if (o === 'n') {
-				this.tabIndex = 1
+				this.tabIndex = tab
 			} else {
 				this.tabIndex = 0
 			}

@@ -16,6 +16,12 @@
 
 <script>
 	import {
+		initApp
+	} from "@/utils/init";
+	import {
+		initPush
+	} from "@/utils/push";
+	import {
 		webUrl
 	} from "@/utils/config";
 
@@ -40,16 +46,16 @@
 				url: "/pages/index/splash",
 			})
 			//#endif
-		
+
 			//#ifdef APP-PLUS 
 			let platform = uni.getSystemInfoSync().osName;
 			uni.setStorageSync("platform", platform);
-				
+
 			let agree = uni.getStorageSync('agree');
 			if (!agree) {
 				this.showDialog = true;
 			} else {
-				uni.reLaunch({
+				uni.redirectTo({
 					url: "/pages/index/splash",
 				})
 			}
@@ -58,13 +64,13 @@
 		methods: {
 			linkClick(index) {
 				uni.navigateTo({
-					url: '/pages/common/webview?url=' + encodeURIComponent(this.linkList[index].url) + '&name=' +
-						encodeURIComponent(this.linkList[index].name),
+					url: '/pages/common/webview?title=' + encodeURIComponent(this.linkList[index].name) + '&url=' +
+						encodeURIComponent(this.linkList[index].url),
 				})
 			},
 			disagree() {
 				// #ifdef APP-PLUS
-				switch (uni.getSystemInfoSync().platform) {
+				switch (uni.getSystemInfoSync().osName) {
 					case 'android':
 						plus.runtime.quit();
 						break;
@@ -80,11 +86,12 @@
 			},
 			agree() {
 				uni.setStorageSync('agree', 1) // 设置缓存，下次进入应用不再弹出
-				
-				let deviceInfo = uni.getStorageSync('deviceInfo');
-				if (!deviceInfo) {
-					uni.setStorageSync("deviceInfo", plus.device.getDeviceId());
-				}
+
+				uni.setStorageSync("deviceInfo", plus.device.getDeviceId());
+
+				initApp();
+
+				initPush();
 				
 				uni.reLaunch({
 					url: "/pages/index/splash"

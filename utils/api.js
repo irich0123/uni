@@ -44,7 +44,7 @@ export const myRequest = (options) => {
 					uni.hideLoading();
 				}
 				console.log("连接成功: ", options)
-				console.log("后台返回数据: ", res)
+				console.log("后台返回数据: ", res.data)
 				if (res.statusCode === 200) {
 					if (res.data.retCode === 0) {
 						resolve(res.data);
@@ -64,7 +64,7 @@ export const myRequest = (options) => {
 							})
 						}, 1000)
 
-					} else if (res.retCode > 200 && res.retCode < 300) {
+					} else if (res.data.retCode > 200 && res.data.retCode < 300) {
 						resolve(res.data); //特殊处理，这个有支付接口是这么返回信息的
 					} else {
 						if (!!options.catch) { //指定需要截获错误信息进行处理

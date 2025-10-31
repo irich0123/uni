@@ -1,20 +1,19 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef H5 -->
-		<my-nav-bar title="承接详情" @action="navAction" @reSize="reSize" :clear-title="clearTitle" />
+		<my-nav-bar title="承接详情" @action="navAction" @reSize="reSize" class="my-nav-bar" :clear-title="clearTitle" />
 		<!-- #endif -->
 
-		<!-- #ifndef MP-WEIXIN -->
 		<uni-transition class="top-notify-tips" :duration="2000" :mode-class="modeClass" :styles="transformClass"
 			:show="transShow">
 			<uni-notice-bar :showClose="true" :show="isShowNotice" moreText="详情" :showGetMore="true"
-				text="把此信息分享给好友，有免费金豆赠送哦！" @close="closeNotice" @getmore="getNoticeMore" />
+				:style="'width:100%;margin-top:'+ tipsTop +'px;'" text="把此信息分享给好友，有免费金豆赠送哦！" @close="closeNotice"
+				@getmore="getNoticeMore" />
 		</uni-transition>
-		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'"
 			@scroll="scrollHandle">
-			<info-banner :adv-pic="workOrderBannerImg" :img-urls="workOrder.img" />
+			<info-banner :adv-pic="workOrderBannerImg" :img-urls="workOrder.img" style="height: 456rpx;" />
 
 			<view class="bg-white padding-tb-sm padding-lr-lg">
 				<view class="info-title text-xl padding-top-ssm">
@@ -318,6 +317,7 @@
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
+				tipsTop: 0,
 
 				safeAreaTop: 0,
 			}
@@ -351,9 +351,9 @@
 				handler(newVal, oldVal) {
 					//#ifndef H5
 					let windowInfo = uni.getWindowInfo();
-					this.contentTop = newVal + 40;
-					this.listHeight = uni.getWindowInfo().safeArea.height - newVal;
 					this.safeAreaTop = windowInfo.safeAreaInsets.bottom;
+					this.listHeight = windowInfo.safeArea.bottom;
+					this.tipsTop = newVal + 40;
 					//#endif
 					// #ifdef H5
 					this.listHeight = uni.getWindowInfo().safeArea.height - (active === 'prod' ? 0 : 40);
@@ -376,9 +376,7 @@
 
 			this.workOrder.id = this.nodeId;
 
-			// #ifdef H5
 			this.initAnimation();
-			// #endif
 
 			this.isShowLike = !this.fromAdmin && this.guessLikeList && this.guessLikeList.length > 0;
 
@@ -588,7 +586,7 @@
 					}
 
 					if (!!workOrder.promptInfo) {
-						workOrder.promptInfo = workOrder.promptInfo.replaceAll("\r\n", "\n");
+						workOrder.promptInfo = workOrder.promptInfo.replace(/\\r\\n/g, "\n");
 					} else {
 						workOrder.promptInfo = '';
 					}

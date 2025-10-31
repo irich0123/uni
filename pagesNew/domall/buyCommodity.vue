@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="下单购买" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="下单购买" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -355,7 +355,6 @@
 							confirmColor: '#fb5318',
 							success: function(res0) {
 								if (res0.confirm) {
-									console.log('用户点击确定');
 									uni.redirectTo({
 										url: '/pagesNew/domall/buyCommodityConfirm?transactionId=' +
 											self.transactionId,
@@ -372,7 +371,6 @@
 							confirmColor: '#fb5318',
 							success: function(res0) {
 								if (res0.confirm) {
-									console.log('用户点击确定');
 									uni.navigateBack({
 										delta: 1,
 									})
@@ -460,7 +458,6 @@
 								confirmColor: '#fb5318',
 								success: function(res1) {
 									if (res1.confirm) {
-										console.log('用户点击确定');
 										uni.navigateBack({
 											delta: 1,
 										})
@@ -600,7 +597,7 @@
 							.carrierId)
 
 						if (commodity.promptInfo) {
-							commodity.promptInfo = commodity.promptInfo.replaceAll("\r\n", "\n")
+							commodity.promptInfo = commodity.promptInfo.replace(/\\r\\n/g, "\n");
 						} else {
 							commodity.promptInfo = '';
 						}
@@ -616,7 +613,6 @@
 			},
 			otherFun(object) { //选择地址后的数据收集
 				if (!!object) {
-					console.log(object);
 					this.addressData = object.address;
 				}
 			},

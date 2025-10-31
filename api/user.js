@@ -54,6 +54,30 @@ export const userLogout = () => {
 }
 
 
+/**
+ * 用户是否申请注销
+ */
+export const userCancelCheck = () => {
+    return myRequest({
+        url: '/userapi/userInfoController/checkCancellation',
+        method: 'POST',
+        data: {}
+    })
+}
+
+
+/**
+ * 用户注销
+ */
+export const userLogoff = () => {
+    return myRequest({
+        url: '/userapi/userInfoController/doCancellation',
+        method: 'POST',
+        data: {}
+    })
+}
+
+
 
 ////////////////用户相册////////////////////////////
 /**

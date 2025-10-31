@@ -1,7 +1,7 @@
 <template>
 	<view class="container flex flex-direction no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="企业编辑" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="企业编辑" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -21,7 +21,7 @@
 						</uni-forms-item>
 					</view>
 
-					<view @click.stop="chooseImageShop">
+					<view @click.stop="beforeSelectImage">
 						<uni-forms-item label="企业logo" name="logo" required>
 							<view class="flex align-center">
 								<image class="margin-lr-sm radius-xs" style="height: 90rpx;"
@@ -135,6 +135,12 @@
 		getImageInfo,
 		uploadImg
 	} from "@/api/upload.js";
+	//#ifdef APP-PLUS
+	import {
+		checkCamera,
+		checkAlbum
+	} from '@/utils/android_permission.js'
+	//#endif
 
 	export default {
 		name: "enterpriseEdit",
@@ -436,13 +442,89 @@
 					}
 				});
 			},
+			beforeSelectImage() {
+				//#ifndef APP-PLUS
+				this.selectImage();
+				//#endif
+				//#ifdef APP-PLUS
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					this.selectImage();
+				} else if (platform === 'android') {
+					let self = this;
+					uni.showActionSheet({
+						itemList: ['拍摄', '从相册选择'],
+						success: function(res) {
+							if (res.tapIndex === 0) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.camera) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传企业Logo时，需要调用摄像头拍照功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkCamera()) {
+													self.selectImage(["camera"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.camera === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的摄像头功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.camera === 1) {
+									self.selectImage(['camera']);
+								}
+							} else if (res.tapIndex === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.storage) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传企业Logo时，需要调用您的本地存储功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkAlbum()) {
+													self.selectImage(["album"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.storage === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的本地存储功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.storage === 1) {
+									self.selectImage(['album']);
+								}
+							}
+						}
+					})
+				}
+				//#endif
+			},
+
 			//选择企业logo
-			chooseImageShop() {
+			selectImage(sourceType) {
+				if (!sourceType) {
+					sourceType = ['album', 'camera'];
+				}
+
 				let self = this
 				uni.chooseImage({
 					count: 1,
 					sizeType: ['compressed'],
-					sourceType: ['album'],
+					sourceType: sourceType,
 					success: function(res) {
 						let filePathArray = res.tempFilePaths
 						let fileArray = res.tempFiles
@@ -453,6 +535,25 @@
 						}
 						// #endif
 						self.handleEachFile(filePathArray, fileArray)
+					},
+					fail: function(res) {
+						//#ifdef APP-PLUS
+						console.log(res);
+						if (res.errMsg.indexOf("No Permission") > -1) {
+							if (sourceType.length === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission) {
+									permission = {};
+								}
+								if (sourceType[0] === 'album') {
+									permission.storage = 0;
+								}else if(sourceType[0] === 'camera'){
+									permission.camera = 0;
+								}
+								uni.setStorageSync("permission",permission);
+							}
+						}
+						//#endif
 					}
 				})
 			},

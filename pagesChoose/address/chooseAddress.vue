@@ -7,7 +7,7 @@
 					this.listHeight = uni.getWindowInfo().safeArea.height - (active === 'prod' ? 0 : 40);
 					// #endif">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="选择收货地址" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="选择收货地址" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view class="bg-gray-1" scroll-y :style="'padding-top:'+ contentTop +'px;height:'+listHeight+'px;'"

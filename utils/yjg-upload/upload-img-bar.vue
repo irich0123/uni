@@ -13,7 +13,7 @@
 				<image :src="item" style="width:120rpx;height:120rpx;" mode="aspectFill" />
 			</view>
 			<view class="gray-border-1 radius-s margin-top-sm margin-right-sm flex align-center justify-center"
-				@click="selectImage" v-if="showPlusBtn" style="width:120rpx;height:120rpx;">
+				@click="beforeSelectImage" v-if="showPlusBtn" style="width:120rpx;height:120rpx;">
 				<uni-icons color="#cccccc" type="plusempty" size="30" />
 			</view>
 		</view>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	import UniIcons from "../../components/uni-icons/uni-icons";
+	import UniIcons from "@/components/uni-icons/uni-icons";
 	import {
 		baseUrl
 	} from "@/utils/config";
@@ -32,7 +32,12 @@
 		getImageInfo,
 		uploadImg
 	} from "@/api/upload.js";
-
+	//#ifdef APP-PLUS
+	import {
+		checkCamera,
+		checkAlbum
+	} from '@/utils/android_permission.js'
+	//#endif
 	export default {
 		name: "uploadImgBar",
 		components: {
@@ -140,15 +145,88 @@
 					})
 				})
 			},
+			beforeSelectImage() {
+				//#ifndef APP-PLUS
+				this.selectImage();
+				//#endif
+				//#ifdef APP-PLUS
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					this.selectImage();
+				} else if (platform === 'android') {
+					let self = this;
+					uni.showActionSheet({
+						itemList: ['拍摄', '从相册选择'],
+						success: function(res) {
+							if (res.tapIndex === 0) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.camera) {
+									uni.showModal({
+										title: '提示',
+										content: '在发布信息或提交意见反馈时，需要调用摄像头拍照功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkCamera()) {
+													self.selectImage(["camera"])
+												}
+											}
+										}
+									});
 
-			//从相册中选择
-			selectImage() {
+								} else if (permission.camera === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的摄像头功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.camera === 1) {
+									self.selectImage(['camera']);
+								}
+							} else if (res.tapIndex === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.storage) {
+									uni.showModal({
+										title: '提示',
+										content: '在发布信息或提交意见反馈时，需要调用您的本地存储功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkAlbum()) {
+													self.selectImage(["album"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.storage === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的本地存储功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.storage === 1) {
+									self.selectImage(['album']);
+								}
+							}
+						}
+					})
+				}
+				//#endif
+			},
+
+			selectImage(sourceType) {
+				if (!sourceType) {
+					sourceType = ['album', 'camera'];
+				}
+
 				let self = this
-
 				uni.chooseImage({
 					count: this.imgLengthMax - this.imgList.length, //默认9
-					sizeType: ['original'], //可以指定是原图还是压缩图，默认二者都有
-					sourceType: ['album', 'camera'],
+					sizeType: ['original'],
+					sourceType: sourceType,
 					success: function(res) {
 
 						let filePathArray = res.tempFilePaths
@@ -156,14 +234,33 @@
 
 						// #ifdef H5
 						if (filePathArray.length > (self.imgLengthMax - self.imgList.length)) {
-							filePathArray = filePathArray.slice(0, (self.imgLengthMax - self.imgList.length))
-							fileArray = fileArray.slice(0, (self.imgLengthMax - self.imgList.length))
+							filePathArray = filePathArray.slice(0, (self.imgLengthMax - self
+								.imgList
+								.length))
+							fileArray = fileArray.slice(0, (self.imgLengthMax - self.imgList
+								.length))
 						}
 						// #endif
 						self.handleEachFile(filePathArray, fileArray)
 					},
-					fail(err) {
-						console.log('失败', err);
+					fail: function(res) {
+						//#ifdef APP-PLUS
+						console.log(res);
+						if (res.errMsg.indexOf("No Permission") > -1) {
+							if (sourceType.length === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission) {
+									permission = {};
+								}
+								if (sourceType[0] === 'album') {
+									permission.storage = 0;
+								} else if (sourceType[0] === 'camera') {
+									permission.camera = 0;
+								}
+								uni.setStorageSync("permission", permission);
+							}
+						}
+						//#endif
 					},
 					complete() {
 						console.log('结束');
@@ -175,7 +272,9 @@
 				for (let i = 0; i < filePathArray.length; i++) {
 					let imgFilePath = filePathArray[i];
 					// #ifdef H5
-					const file = await imgCompress(imgFilePath, (imgFilePath.size > 1024 * 1024 * 0.5) ? 0.2 : 0.8);
+					const file = await imgCompress(imgFilePath, (imgFilePath.size > 1024 * 1024 * 0.5) ?
+						0.2 :
+						0.8);
 					this.uploadImage(file);
 					// #endif
 					// #ifndef H5
@@ -193,8 +292,8 @@
 			//图片上传
 			async uploadImage(data) {
 				const imgData = await uploadImg(data);
-				
-				imgData.forEach(v=>{
+
+				imgData.forEach(v => {
 					this.imgList.push(v.webPath);
 				})
 

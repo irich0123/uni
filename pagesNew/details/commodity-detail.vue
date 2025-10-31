@@ -1,12 +1,12 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="商品详情" @action="navAction" @reSize="reSize" :clear-title="clearTitle" />
+		<my-nav-bar title="商品详情" @action="navAction" @reSize="reSize" :clear-title="clearTitle" class="my-nav-bar"/>
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'"
 			@scroll="scrollHandle">
-			<info-banner :img-urls="commodity.photos" style="height:465rpx" />
+			<info-banner :img-urls="commodity.photos" style="height:456rpx" />
 
 			<view>
 				<!--            用户信息开始-->
@@ -423,9 +423,8 @@
 				handler(newVal, oldVal) {
 					//#ifndef H5
 					let windowInfo = uni.getWindowInfo();
-					this.contentTop = newVal + 40;
-					this.listHeight = uni.getWindowInfo().safeArea.height - newVal;
 					this.safeAreaTop = windowInfo.safeAreaInsets.bottom;
+					this.listHeight = windowInfo.safeArea.bottom;
 					//#endif
 					// #ifdef H5
 					this.listHeight = uni.getWindowInfo().safeArea.height - (active === 'prod' ? 0 : 40);

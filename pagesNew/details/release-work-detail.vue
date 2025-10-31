@@ -1,20 +1,19 @@
 <template>
 	<view class="container">
 		<!-- #ifndef H5 -->
-		<my-nav-bar title="外发详情" @action="navAction" @reSize="reSize" :clear-title="clearTitle" />
+		<my-nav-bar title="外发详情" @action="navAction" @reSize="reSize" :clear-title="clearTitle" class="my-nav-bar" />
 		<!-- #endif -->
 
-		<!-- #ifndef MP-WEIXIN -->
 		<uni-transition class="top-notify-tips" :duration="2000" :mode-class="modeClass" :styles="transformClass"
 			:show="transShow">
 			<uni-notice-bar :showClose="true" :show="isShowNotice" moreText="详情" :showGetMore="true"
-				text="把此信息分享给好友，有免费金豆赠送哦！" @close="closeNotice" @getmore="getNoticeMore" />
+				:style="'width:100%;margin-top:'+ tipsTop +'px;'" text="把此信息分享给好友，有免费金豆赠送哦！" @close="closeNotice"
+				@getmore="getNoticeMore" />
 		</uni-transition>
-		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'"
 			@scroll="scrollHandle">
-			<info-banner :adv-pic="releaseWorkBannerImg" :img-urls="releaseWork.img" />
+			<info-banner :adv-pic="releaseWorkBannerImg" :img-urls="releaseWork.img" style="height: 456rpx;" />
 
 			<view class="detail bg-white padding-tb-sm padding-lr-lg">
 				<view class="info-title text-xl padding-top-ssm">
@@ -450,7 +449,8 @@
 	} from "@/utils/myUtil";
 	import wucTab from '@/components/wuc-tab/wuc-tab'
 	import {
-		imgUrl,active
+		imgUrl,
+		active
 	} from "@/utils/config";
 	import UserBarNormal from "@/utils/yjg-user/user-bar-normal";
 	// #ifndef H5
@@ -565,6 +565,7 @@
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
+				tipsTop: 0,
 
 				safeAreaTop: 0,
 			}
@@ -598,9 +599,9 @@
 				handler(newVal, oldVal) {
 					//#ifndef H5
 					let windowInfo = uni.getWindowInfo();
-					this.contentTop = newVal + 40;
-					this.listHeight = uni.getWindowInfo().safeArea.height - newVal;
 					this.safeAreaTop = windowInfo.safeAreaInsets.bottom;
+					this.listHeight = windowInfo.safeArea.bottom;
+					this.tipsTop = newVal + 40;
 					//#endif
 					// #ifdef H5
 					this.listHeight = uni.getWindowInfo().safeArea.height - (active === 'prod' ? 0 : 40);
@@ -632,13 +633,13 @@
 
 			this.releaseWork.id = this.nodeId;
 
-			// #ifdef H5
 			this.initAnimation();
-			// #endif
 
 			this.isShowLike = !this.fromAdmin && this.guessLikeList && this.guessLikeList
 				.length > 0
+			//#ifdef H5
 			this.isShowFab = !!this.directOpen;
+			//#endif
 		},
 		methods: {
 			navAction(e) {
@@ -837,7 +838,7 @@
 						releaseWork.count = 0;
 					}
 
-					if (releaseWork.userId === this.userData.id) {
+					if (this.userData && this.userData.id && releaseWork.userId === this.userData.id) {
 						this.isShowMyOperationButton = !!this.fromAdmin;
 						this.isShowUserOperationButton = false;
 					} else {
@@ -849,13 +850,11 @@
 						}
 						this.isShowMyOperationButton = false;
 					}
-
 					if (!!releaseWork.promptInfo) {
-						releaseWork.promptInfo = releaseWork.promptInfo.replaceAll("\r\n", "\n");
+						releaseWork.promptInfo = releaseWork.promptInfo.replace(/\\r\\n/g, "\n");
 					} else {
 						releaseWork.promptInfo = '';
 					}
-
 					let resContractList = releaseWork.contractList
 					if (!!resContractList && resContractList.length > 0) {
 						this.contractCount = resContractList.length
@@ -947,7 +946,7 @@
 							}
 						});
 						self.guessLikeList = res.data.list
-						
+
 						self.isShowLike = !self.fromAdmin && self.guessLikeList && self.guessLikeList.length > 0;
 					}
 					self.isLoading = false;
@@ -1118,7 +1117,6 @@
 			},
 			//悬浮按钮的操作
 			trigger(e) {
-				console.log(e);
 				this.content[e.index].active = !e.item.active;
 				if (e.index === 0) {
 					uni.switchTab({
@@ -1198,7 +1196,6 @@
 						confirmColor: '#fb5318',
 						success: function(res) {
 							if (res.confirm) {
-								console.log('用户点击确定');
 								uni.navigateTo({
 									url: '/pagesCertification/personal/index',
 								})
@@ -1265,7 +1262,6 @@
 						confirmColor: '#fb5318',
 						success: function(res) {
 							if (res.confirm) {
-								console.log('用户点击确定');
 								uni.navigateTo({
 									url: '/pagesCertification/personal/index',
 								})
@@ -1335,7 +1331,8 @@
 						uniShare.show({
 							content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
 								type: 0,
-								href: h5WebUrl + 'pagesNew/details/sendDetails?id=' + self.releaseWork.id,
+								href: h5WebUrl + 'pagesNew/details/sendDetails?id=' + self.releaseWork
+									.id,
 								title: self.releaseWork.title,
 								summary: '没活干就上云加工',
 								imageUrl: img,
@@ -1408,6 +1405,7 @@
 
 	.container {
 		width: 100%;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 	}

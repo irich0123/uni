@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="最新活动" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="最新活动" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view class="bg-gray-1" scroll-y :style="'padding-top:'+ contentTop +'px;height:'+listHeight+'px;'"
@@ -180,8 +180,7 @@
 				this.triggered = false;
 			},
 			toDetail(item) {
-				if (item.localUrl.indexOf("http:") > -1) {
-					//todo 小程序和公众号分享 及APP分享功能
+				if (item.localUrl.indexOf("http") > -1) {
 					uni.navigateTo({
 						url: '/pages/common/webview?url=' + encodeURIComponent(item.localUrl + "?t=" + new Date().getTime()),
 					})

@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="外发搜索" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="外发搜索" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<view class="margin-lr-sm bg-gray-1" :style="'padding-top:'+contentTop+'px;'">

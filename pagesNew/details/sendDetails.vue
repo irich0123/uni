@@ -145,7 +145,6 @@
 								success: function() {
 								},
 								cancel: function() {
-									console.log("取消分享")
 								}
 							})
 							//分享到微信朋友（即将废弃。可以获取到用户是分享还是取消）
@@ -159,7 +158,6 @@
 								success: function() {
 								},
 								cancel: function() {
-									console.log("取消分享")
 								},
 							});
 						})

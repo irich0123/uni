@@ -43,7 +43,7 @@
 <script>
 	let platform = 'other'
 	// #ifdef APP-NVUE
-	platform = uni.getSystemInfoSync().platform
+	platform = uni.getSystemInfoSync().osName
 	// #endif
 
 	/**

@@ -1,7 +1,7 @@
 <template>
 	<view class="container flex flex-direction no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="企业认证" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="企业认证" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -37,7 +37,7 @@
 					</view>
 				</view>
 			</view>
-			<view @click="onPlus(1)" class="flex align-center justify-center margin-bottom radius bg-white"
+			<view @click="beforeSelectImage(1)" class="flex align-center justify-center margin-bottom radius bg-white"
 				style="width: 100%;">
 				<view class="radius"
 					:style="'background-image: url('+imgUrl+'/certification/bg_business_1.png);background-size: 100% 100%;width:710rpx;height:381rpx;'">
@@ -45,14 +45,14 @@
 						:src="businessLicenseImg"></image>
 				</view>
 			</view>
-			<view @click="onPlus(2)" class="flex align-center justify-center margin-bottom radius bg-white"
+			<view @click="beforeSelectImage(2)" class="flex align-center justify-center margin-bottom radius bg-white"
 				style="width: 100%;">
 				<view class="radius"
 					:style="'background-image: url('+imgUrl+'/certification/bg_door_1.png);background-size: 100% 100%;width:710rpx;height:381rpx;'">
 					<image class="radius" style="width:710rpx;height:381rpx;" mode="scaleToFill" :src="gateImg"></image>
 				</view>
 			</view>
-			<view @click="onPlus(3)" class="flex align-center justify-center margin-bottom radius bg-white"
+			<view @click="beforeSelectImage(3)" class="flex align-center justify-center margin-bottom radius bg-white"
 				style="width: 100%;">
 				<view class="radius"
 					:style="'background-image: url('+imgUrl+'/certification/bg_office_1.png);background-size: 100% 100%;width:710rpx;height:381rpx;'">
@@ -87,7 +87,13 @@
 		getImageInfo,
 		uploadImg
 	} from "@/api/upload";
-
+	//#ifdef APP-PLUS
+	import {
+		checkCamera,
+		checkAlbum
+	} from '@/utils/android_permission.js'
+	//#endif
+	
 	export default {
 		name: "index",
 		components: {
@@ -282,40 +288,121 @@
 					self.isLoading = false;
 				});
 			},
-			onPlus(type) {
+			beforeSelectImage(type) {
 				if (!this.actionEdit) {
 					return;
 				}
-				let self = this
 				this.type = type;
-				uni.showActionSheet({
-					itemList: ['从相册中选择', '拍照'],
-					itemColor: '#fb5318',
-					success: function(res) {
-						if (res.tapIndex === 0) {
-							self.chooseShop('album')
-						} else if (res.tapIndex === 1) {
-							self.chooseShop('camera')
+				
+				//#ifndef APP-PLUS
+				this.selectImage();
+				//#endif
+				//#ifdef APP-PLUS
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					this.selectImage();
+				} else if (platform === 'android') {
+					let self = this;
+					uni.showActionSheet({
+						itemList: ['拍摄', '从相册选择'],
+						success: function(res) {
+							if (res.tapIndex === 0) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.camera) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传企业认证信息时，需要调用摄像头拍照功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkCamera()) {
+													self.selectImage(["camera"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.camera === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的摄像头功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.camera === 1) {
+									self.selectImage(['camera']);
+								}
+							} else if (res.tapIndex === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission || !permission.storage) {
+									uni.showModal({
+										title: '提示',
+										content: '在上传企业认证信息时，需要调用您的本地存储功能，请确认同意，否则将无法使用此项功能',
+										showCancel: false,
+										confirmText: '我知道了',
+										success: function(res0) {
+											if (res0.confirm) {
+												if (checkAlbum()) {
+													self.selectImage(["album"])
+												}
+											}
+										}
+									});
+
+								} else if (permission.storage === -1) {
+									uni.showToast({
+										title: '您已拒绝使用您的本地存储功能！',
+										icon: 'none',
+										duration: 2000,
+									})
+								} else if (permission.storage === 1) {
+									self.selectImage(['album']);
+								}
+							}
 						}
-					},
-					fail: function(res) {}
-				});
+					})
+				}
+				//#endif
 			},
-			chooseShop(source) {
+			selectImage(sourceType) {
+				if (!sourceType) {
+					sourceType = ['album', 'camera'];
+				}
+
 				let self = this
 				uni.chooseImage({
 					count: 1,
 					sizeType: ['compressed'],
-					sourceType: [source],
+					sourceType: sourceType,
 					success: function(res) {
 						let filePathArray = res.tempFilePaths
 						let fileArray = res.tempFiles
-
+						// #ifdef H5
 						if (filePathArray.length > 1) {
 							filePathArray = filePathArray.slice(0, 1)
 							fileArray = fileArray.slice(0, 1)
 						}
+						// #endif
 						self.handleEachFile(filePathArray, fileArray)
+					},
+					fail: function(res) {
+						//#ifdef APP-PLUS
+						console.log(res);
+						if (res.errMsg.indexOf("No Permission") > -1) {
+							if (sourceType.length === 1) {
+								let permission = uni.getStorageSync("permission");
+								if (!permission) {
+									permission = {};
+								}
+								if (sourceType[0] === 'album') {
+									permission.storage = 0;
+								}else if(sourceType[0] === 'camera'){
+									permission.camera = 0;
+								}
+								uni.setStorageSync("permission",permission);
+							}
+						}
+						//#endif
 					}
 				})
 			},

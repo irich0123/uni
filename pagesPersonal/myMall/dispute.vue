@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="争议情况" @action="navAction" @reSize="reSize"
+		<my-nav-bar title="争议情况" @action="navAction" @reSize="reSize" class="my-nav-bar"
 			:img-btn-src1="imgUrl+'/mall/ic_servant_white.png'" />
 		<!-- #endif -->
 

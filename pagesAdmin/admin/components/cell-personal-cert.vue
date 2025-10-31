@@ -110,7 +110,7 @@
 			gotoPreview(item, index) {
 				uni.previewImage({
 					current: index,
-					urls: [item.avatar, item.idCardImgFront, item.idCardImgBack],
+					urls: [item.idCardImgFront, item.idCardImgBack, item.avatar],
 					loop: true
 				});
 			},
@@ -132,7 +132,7 @@
 		width: 300upx;
 		height: 200upx;
 	}
-	
+
 	.user-box {
 		display: flex;
 		flex-direction: row;

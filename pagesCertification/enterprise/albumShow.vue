@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="TA的相册" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="TA的相册" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<wuc-tab :tab-list="tabBars" @change="tabClicked" textFlex :tabCur.sync="tabIndex"

@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view class="container" :style="'height:'+(statusbarHeight+40)+'px;'">
 		<view class="index-header" :class="clearTitle?'':'bg-theme-title'">
 			<view :style="'height:'+statusbarHeight+'px;width:100%'"></view>
 			<view class="flex align-center action-bar" :style="'width:' +menubarLeftPosition+'px'">
@@ -9,7 +9,8 @@
 					<!-- #ifndef MP-WEIXIN -->
 					<view class="flex back-icon align-center flex-sub" @click="toBack">
 					<!-- #endif -->
-						<image style="width:16rpx;" :src="imgUrl+'/ic_back.png'" mode="widthFix"></image>
+						<uni-icons type="back" color="#777" size="22" style="line-height: 1;padding-left: 10rpx;" v-if="clearTitle"></uni-icons>
+						<uni-icons type="back" color="white" size="22" style="line-height: 1;padding-left: 10rpx;" v-else></uni-icons>
 					</view>
 					<!-- #ifdef MP-WEIXIN -->
 					<view class="flex-twice text-xl color-white padding-left-xs title">{{title}}</view>
@@ -20,18 +21,18 @@
 					<!-- #ifdef APP-PLUS -->
 					<view class="flex-sub flex justify-end padding-right margin-right-sm">
 					<!-- #endif -->
-					<!-- #ifndef APP-PLUS -->
-					<view class="flex-sub flex justify-end">
-					<!-- #endif -->
-						<image class="margin-right-xs" style="height:50rpx" v-if="imgBtnSrc1" :src="imgBtnSrc1"
-							mode="heightFix" @click="btnClicked(1)" />
-						<image class="margin-right-xs" style="height:50rpx" v-if="imgBtnSrc2" :src="imgBtnSrc2"
-							mode="heightFix" @click="btnClicked(2)" />
+						<!-- #ifndef APP-PLUS -->
+						<view class="flex-sub flex justify-end">
+						<!-- #endif -->
+							<image class="margin-right-xs" style="height:50rpx" v-if="imgBtnSrc1" :src="imgBtnSrc1"
+								mode="heightFix" @click="btnClicked(1)" />
+							<image class="margin-right-xs" style="height:50rpx" v-if="imgBtnSrc2" :src="imgBtnSrc2"
+								mode="heightFix" @click="btnClicked(2)" />
+						</view>
 					</view>
 				</view>
 			</view>
 		</view>
-	</view>
 
 </template>
 
@@ -87,9 +88,9 @@
 				// #endif
 
 				this.toSize();
-
 			},
 			toBack() {
+				console.log("back");
 				this.$emit("action", {
 					action: 'back'
 				});
@@ -109,10 +110,8 @@
 </script>
 
 <style scoped lang="scss">
-	.index-header {
-		position: fixed;
+	.container {
 		width: 100%;
-		z-index: 9;
 	}
 
 	.action-bar {

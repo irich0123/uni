@@ -1,7 +1,7 @@
 <template>
 	<view class="main no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="审核管理" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="审核管理" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<view :style="'padding-top:'+contentTop+'px;'" class="flex align-center">

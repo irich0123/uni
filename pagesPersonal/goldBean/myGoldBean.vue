@@ -1,7 +1,7 @@
 <template>
 	<view class="container flex flex-direction no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="我的金豆" @action="navAction" @reSize="reSize" />
+		<my-nav-bar title="我的金豆" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<view :style="'padding-top:'+contentTop+'px;'">

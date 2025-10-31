@@ -864,8 +864,15 @@
 				this.scrollOverBanner = e.detail.scrollTop > 240;
 			},
 			recordShareTask(userId) {
-				recordShareTasknonH5({
-					userId: userId
+				    // 云加工小程序(1), 云加工公众号(2),云招工公众号(3);
+				recordShareTasknonH5({		//非公众号以外的H5网页分享
+					userId: userId,
+					//#ifdef H5
+					appType: 2
+					//#endif
+					//#ifdef MP-WEIXIN
+					appType: 1
+					//#endif
 				}).then();
 			}
 		},

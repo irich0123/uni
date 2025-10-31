@@ -287,8 +287,9 @@
 	// #ifdef APP-PLUS
 	let jpushModule = uni.requireNativePlugin("JG-JPush");
 	import {
-		gotoAppPermissionSetting
-	} from "@/js_sdk/wa-permission/permission.js";
+		judgeIosPermission
+	}
+	from "@/js_sdk/wa-permission/permission.js"
 	// #endif
 
 	export default {
@@ -354,8 +355,6 @@
 				isShowGiftStore: false, //是否显示金豆商城
 				isShowSignModule: false, //是否可以签到
 
-
-
 				mainSwitch: true,
 				templateList: [],
 				toAsk: [],
@@ -370,14 +369,17 @@
 			// #ifdef MP-WEIXIN
 			let lastAskTime = uni.getStorageSync('lastAskTime');
 
-			if ((!lastAskTime || ((new Date().getTime() - lastAskTime) > 1 * 60 * 60 * 1000))) {
-				this.requestSubscribe();
+			if ((!lastAskTime || ((new Date().getTime() - lastAskTime) > 10 * 60 * 1000))) {
+				if (this.token) {
+					this.briefSubscribeTemplate();
+				}
 			}
 			// #endif
 		},
 		onLoad() {
 			this.token = uni.getStorageSync('token')
 			this.userData = uni.getStorageSync("user")
+
 
 			this.getSystemStatusBarHeight();
 
@@ -391,6 +393,18 @@
 				uni.removeStorageSync("needRefresh");
 				this.initData();
 			}
+
+			// #ifdef APP-PLUS
+			let notifyConfirmTime = uni.getStorageSync('notifyConfirmTime');
+			if(!notifyConfirmTime){
+				notifyConfirmTime = new Date().getTime();
+			}
+			if ((new Date().getTime() - notifyConfirmTime) > 3 * 60 * 60 *1000) {
+				uni.setStorageSync('notifyConfirmTime', new Date().getTime());
+				this.toCheckNotify();
+			}
+			// #endif
+
 		},
 		methods: {
 			//获取系统状态栏高度
@@ -424,6 +438,8 @@
 				if (!!this.token) {
 					this.loadUserData();
 				}
+
+
 			},
 			aniHandle() {
 				this.transShow = true;
@@ -482,15 +498,6 @@
 							self.userData = Object.assign({}, res.data);
 						}
 
-						// #ifdef APP-PLUS
-						let notifyConfirmTime = uni.getStorageSync('notifyConfirmTime');
-						if (!notifyConfirmTime || (new Date().getTime() - notifyConfirmTime) > 3 * 24 * 60 * 60 *
-							1000) {
-							if (uni.getSystemInfoSync().platform == "ios") {
-								self.toCheckNotify();
-							}
-						}
-						// #endif
 
 						//#ifdef H5
 						self.getWxSubscribeInfoForUser()
@@ -522,9 +529,29 @@
 				})
 			},
 			toCheckNotify() {
-				jpushModule.requestNotificationAuthorization((result) => {
-					let status = result.status
-					if (status < 2) {
+				let platform = uni.getStorageSync("platform")
+				if (platform === 'android') {
+					jpushModule.isNotificationEnabled((result) => {
+						console.log("result=", result);
+						let status = result.code
+						if (status === 0) {
+							uni.showModal({
+								title: '小二提醒',
+								content: '您未打开APP通知权限，有可能收不到系统通知！现在去打开吗？',
+								cancelText: '取消',
+								confirmText: '确定',
+								confirmColor: '#fb5318',
+								success: function(res1) {
+									if (res1.confirm) {
+										uni.openAppAuthorizeSetting();
+									}
+								}
+							})
+						}
+					});
+				} else if (platform === 'ios') {
+					var e = judgeIosPermission("push");
+					if (!e) {
 						uni.showModal({
 							title: '小二提醒',
 							content: '您未打开APP通知权限，有可能收不到系统通知！现在去打开吗？',
@@ -533,13 +560,12 @@
 							confirmColor: '#fb5318',
 							success: function(res1) {
 								if (res1.confirm) {
-									gotoAppPermissionSetting();
+									uni.openAppAuthorizeSetting();
 								}
-								uni.setStorageSync('notifyConfirmTime', new Date().getTime());
 							}
 						})
 					}
-				});
+				}
 			},
 			toMessage() {
 				if (!this.token) {
@@ -608,6 +634,16 @@
 					}
 				});
 			},
+			briefSubscribeTemplate() {
+				let self = this;
+				briefSubscribeTemplate({}).then(res => {
+					if (res.retCode === 0) {
+						self.toAsk = res.data.my; //排除上次问过，还没被使用过的
+
+						self.requestSubscribe();
+					}
+				});
+			},
 			requestSubscribe() {
 				//排除不要问的
 				this.templateList.forEach(v => {
@@ -639,16 +675,18 @@
 				uni.requestSubscribeMessage({
 					tmplIds: tmpAsk,
 					success(res) {
+						console.log(res);
 						let arr = [];
 						tmpAsk.forEach(v => {
-							arr.push({
-								enumId: self.templateList.find(m => m
-									.templateId === v).enumId,
-								status: res[v],
-							})
+							if (!!res[v]) {
+								arr.push({
+									enumId: self.templateList.find(m => m
+										.templateId === v).enumId,
+									status: res[v],
+								})
+							}
 						})
 						self.updateSubscribe(arr);
-						console.log(res);
 					},
 					fail(res) {
 						console.log(res);
@@ -657,18 +695,15 @@
 			},
 			updateSubscribe(list) {
 				let self = this;
-				let url = '/sms/subscribe/template/update';
 				updateSubscribeTemplate(list).then(res => {
 					console.log(res);
 				});
 			},
 			touchStart() {
 				this.touchStartTime = new Date().getTime();
-				console.log("start", this.touchStartTime);
 			},
 			touchEnd() {
 				this.touchEndTime = new Date().getTime();
-				console.log("end", this.touchEndTime);
 				//#ifdef H5
 				this.avatarClicked();
 				//#endif

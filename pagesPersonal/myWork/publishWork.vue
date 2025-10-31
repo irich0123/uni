@@ -1,7 +1,7 @@
 <template>
 	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="我发的承接" @action="navAction" @reSize="reSize"
+		<my-nav-bar title="我发的承接" @action="navAction" @reSize="reSize" class="my-nav-bar"
 			:img-btn-src1="imgUrl+'/ic_edit_hollow_white.png'" />
 		<!-- #endif -->
 
@@ -89,7 +89,8 @@
 		getWorkOrderStatusEnum
 	} from "@/api/basic";
 	import {
-		imgUrl,active
+		imgUrl,
+		active
 	} from '@/utils/config.js';
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
@@ -205,8 +206,15 @@
 			this.userData = uni.getStorageSync('user')
 
 			let o = options.o
+			let tab = options.tab
+			if (tab === null || tab === undefined) {
+				tab = 1
+			} else {
+				tab = parseInt(tab);
+			}
+
 			if (o === 'n') {
-				this.tabIndex = 1
+				this.tabIndex = tab
 			} else {
 				this.tabIndex = 0
 			}
