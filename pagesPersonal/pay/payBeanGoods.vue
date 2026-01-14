@@ -1,7 +1,7 @@
 <template>
 	<view class="container flex flex-direction no-scroll">
 		<!-- #ifndef  H5-->
-		<my-nav-bar title="购买金豆卡" @action="navAction" @reSize="reSize" class="my-nav-bar" />
+		<my-nav-bar :title="title" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
@@ -9,7 +9,7 @@
 
 			<view class="margin-sm">
 				<uni-list>
-					<uni-list-item title="总金额 [限时优惠]" :show-arrow="false" :right-text="price+'.00元'"
+					<uni-list-item :title="barTitle" :show-arrow="false" :right-text="price+'.00元'"
 						:note="cardInfoList[type].slogan" />
 				</uni-list>
 			</view>
@@ -74,8 +74,14 @@
 		</scroll-view>
 		<view class="bg-white" style="width: 100%;position: fixed;left: 0;bottom: 0;z-index: 19;">
 			<button class="bg-theme text-xl color-white radius-0" :disabled="disableSubmitBtn"
-				@click="submitPay">确认</button>
+				@click="toPay">确认</button>
 		</view>
+
+		<jp-pwd ref="jpPwds" @completed="completed" @forget="forgetPass" :pay-type="pwd.payType" style="z-index: 99;"
+			:key-type="pwd.keyType" :pawType="pwd.pawType" :tite="pwd.title" :contents="pwd.contents"
+			:cancel-type="true" :keep="pwd.keep" :places="pwd.places" contentsColor="#555" :isPwy="pwd.isPwy"
+			titeColor="#fb5318"></jp-pwd>
+
 	</view>
 </template>
 
@@ -89,28 +95,48 @@
 		getBeanCardListIos,
 		getBeanGoodsListAndroid,
 		getBeanGoodsListIos,
-		iapPayVerify
 	} from "@/api/finance";
 	import {
 		payWayConfig,
 		imgUrl,
-		active
+		active,
+		publicKey
 	} from '@/utils/config.js';
 	import {
 		Iap,
 		IapTransactionState
 	} from "@/utils/iap.js";
+	import jpPwd from '@/components/jp-pwd/jp-pwd.vue';
 	import UniList from "@/components/uni-list/uni-list";
 	import UniListItem from "@/components/uni-list-item/uni-list-item";
+
+	// #ifdef H5
+	import {
+		h5OnBridgeReady,
+	} from "@/utils/pay";
+	// #endif
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
+	import {
+		appAliPay,
+		appWeixinPay,
+		mpWeixinMiniPay,
+		iapValidatePaymentResult,
+		iapPay,
+		iapRestore
+	} from "@/utils/pay";
 	// #endif
+
+	const jsEncrypt = require('@/utils/jsencrypt')
+	let jse = new jsEncrypt.JSEncrypt();
+	jse.setPublicKey(publicKey) //配置公钥
 
 	export default {
 		name: "payBeanGoods",
 		components: {
 			UniList,
 			UniListItem,
+			jpPwd,
 			// #ifndef H5
 			myNavBar
 			// #endif
@@ -118,6 +144,8 @@
 		data() {
 			return {
 				price: null,
+				title: '购买金豆',
+				barTitle: '总金额 [限时优惠]',
 
 				list: [],
 				timeLimitImgUrl: imgUrl + '/personal/xianshi.png',
@@ -174,12 +202,25 @@
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
+
+				pwd: {
+					money: 0, //支付金额
+					payType: 'two', //支付样式  one two
+					keyType: 'two', //键盘样式  one two
+					pawType: 'one', //输入框样式  one two
+					title: '系统提示', //标题
+					contents: '请输入支付密码', //提示
+					keep: true, //点击遮挡是否关闭
+					places: 6,
+					isPwy: true
+				},
+				payPassword: null,
+				payMoney: 0, //需要支付的保证金
 			}
 		},
 		watch: {
 			payTypeIndex: {
 				handler(newVal) {
-					console.log(newVal);
 					this.disableSubmitBtn = !(newVal !== null);
 				},
 				immediate: true,
@@ -195,6 +236,15 @@
 					// #endif
 				},
 				immediate: true
+			},
+			title: {
+				handler(newVal) {
+					// #ifdef H5
+					uni.setNavigationBarTitle({
+						title: newVal,
+					})
+					// #endif
+				}
 			}
 		},
 		onLoad(options) {
@@ -202,11 +252,23 @@
 			this.userData = uni.getStorageSync("user");
 			this.openId = uni.getStorageSync('openId');
 
-			this.type = parseInt(options.type);
+			if (!!options.type) {
+				this.type = parseInt(options.type);
+			}
 
 			uni.setNavigationBarTitle({
 				title: this.cardInfoList[this.type].name,
 			});
+
+			this.payWayConfig.forEach(v => {
+				v.active = false;
+			})
+
+			// #ifdef MP-WEIXIN || H5
+			this.payWayConfig.find(v => {
+				return v.key === 'balance'
+			}).active = true;
+			// #endif
 
 			// #ifdef H5
 			this.payWayConfig.find(v => {
@@ -227,6 +289,9 @@
 					return v.key === 'ios-iap'
 				}).active = true;
 			} else {
+				this.payWayConfig.find(v => {
+					return v.key === 'balance'
+				}).active = true;
 				this.payWayConfig.find(v => {
 					return v.key === 'wx-app'
 				}).active = true;
@@ -287,58 +352,7 @@
 
 				if (this._iap._ready) {
 					await this._iap.getProduct();
-					this.restore();
-				}
-			},
-			async restore() {
-				// 检查上次用户已支付且未关闭的订单，可能出现原因：首次绑卡，网络中断等异常
-				try {
-					// 从苹果服务器检查未关闭的订单，可选根据 username 过滤，和调用支付时透传的值一致
-					const transactions = await this._iap.restoreCompletedTransactions({
-						username: ""
-					});
-					console.log("transactions==", transactions);
-
-					if (!transactions.length) {
-						return;
-					}
-
-					transactions.forEach(async (transaction) => {
-						let payOrder = this.iosPayOrderList.find(v => v.receipt === transaction
-							.transactionReceipt);
-						console.log("payOrder==", payOrder);
-						if (payOrder != null) {
-							switch (transaction.transactionState) {
-								case IapTransactionState.purchased:
-									console.log("purchased");
-									// 用户已付款，在此处请求开发者服务器，在服务器端请求苹果服务器验证票据
-									let result = await this.validatePaymentResult({
-										orderNo: payOrder.orderNo,
-										receipt: transaction.transactionReceipt
-									});
-
-									// 验证通过，交易结束，关闭订单
-									if (result != null) {
-										await this._iap.finishTransaction(transaction);
-									}
-
-									break;
-								case IapTransactionState.failed:
-									console.log("failed");
-									// 关闭未支付的订单
-									await this._iap.finishTransaction(transaction);
-									break;
-								default:
-									break;
-							}
-						}
-					})
-
-				} catch (e) {
-					uni.showModal({
-						content: e.message,
-						showCancel: false
-					});
+					iapRestore(this._iap, this.iosPayOrderList);
 				}
 			},
 			initData() {
@@ -382,6 +396,7 @@
 				this.goodsType = item.type;
 				let day = null;
 				if (item.type === 1) { //金豆卡
+					this.title = "购买金豆卡";
 					if (!!item.discount) {
 						this.price = Math.round(item.price * item.discount / 100000);
 					} else {
@@ -390,6 +405,7 @@
 					day = (item.signName.indexOf("月") > -1 ? "30" : (item.signName.indexOf("季") > -1 ? "90" : "365"))
 				} else if (item.type === 0) {
 					this.price = Math.round(item.price / 1000);
+					this.title = "购买金豆";
 				}
 				this.refreshNote(item.type, this.type, day);
 			},
@@ -398,20 +414,49 @@
 				if (cardType === 0) { //金豆及金豆卡
 					if (goodsType === 1) {
 						this.cardInfoList[cardType].slogan = (!!day ? day + "天内，" : '') + "查看外发信息电话，免金豆";
+						this.barTitle = '总金额 [限时优惠]';
 					} else if (goodsType === 0) {
 						this.cardInfoList[cardType].slogan = "用于查看外发信息电话";
+						this.barTitle = '总金额';
 					}
 				} else {
 					this.cardInfoList[cardType].slogan = (!!day ? day + "天内，" : '') + "发布商品信息，免金豆";
 				}
 			},
-
+			password(e) {
+				this.payPassword = e
+				if (this.payPassword) {
+					this.submitPay();
+				} else {
+					uni.showToast({
+						title: '请输入支付密码',
+						icon: "none",
+						duration: 1500
+					})
+				}
+			},
+			forgetPass() {
+				this.$refs.jpPwds.toCancel();
+				uni.navigateTo({
+					url: '/pagesPersonal/pay/setPayPassword',
+				})
+			},
+			completed(e) {
+				this.password(e);
+			},
+			toPay() {
+				if (this.payWayList[this.payTypeIndex].payType === 3) {
+					this.$refs.jpPwds.toOpen();
+				} else {
+					this.submitPay();
+				}
+			},
 			//付款
 			submitPay(e) {
 				let self = this;
-				let checkedProductIndex = this.list.findIndex(v => v.checked);
+				let index = this.list.findIndex(v => v.checked);
 				let payTarget;
-				if (this.list[checkedProductIndex].type === 0) { //金豆
+				if (this.list[index].type === 0) { //金豆
 					payTarget = 2;
 				} else {
 					payTarget = this.isActivation ? this.cardInfoList[this.type].targetType.activated : this.cardInfoList[
@@ -422,24 +467,55 @@
 					"openId": this.openId,
 					"payType": this.payWayList[this.payTypeIndex].payType,
 					"targetType": payTarget,
-					"buyAmount": this.list[checkedProductIndex].type === 0 ? this.list[checkedProductIndex]
+					"buyAmount": this.list[index].type === 0 ? this.list[index]
 						.beanNum : null,
 					"payAmount": this.price * 1000,
 					// #ifdef APP-PLUS
-					"productSaleId": (this.platform == "ios") ? this.list[checkedProductIndex].id : (this.list[
-						checkedProductIndex].type === 0 ? null : this.list[checkedProductIndex].id),
+					"productSaleId": (this.platform == "ios") ? this.list[index].id : (this.list[
+						index].type === 0 ? null : this.list[index].id),
 					// #endif
 					// #ifndef APP-PLUS
-					"productSaleId": this.list[checkedProductIndex].type === 0 ? null : this.list[
-						checkedProductIndex].id,
+					"productSaleId": this.list[index].type === 0 ? null : this.list[
+						index].id,
 					// #endif
 				}
 
-				// #ifdef H5 | MP-WEIXIN 
+				if (this.payWayList[this.payTypeIndex].payType === 3) { //余额支付
+					paramsData["deviceType"] = 2;
+					paramsData["password"] = jse.encrypt(this.payPassword);
+					payAny(paramsData).then(res => {
+						if (res.retCode === 0) {
+							self.paySuccess();
+						}
+					}).catch(err => {
+						uni.showToast({
+							title: err.message,
+							icon: "error",
+						})
+					});
+				} else {
+					// #ifdef H5 | MP-WEIXIN
+					this.h5AndMpHandle(paramsData);
+					// #endif
+
+					// #ifdef APP-PLUS
+					this.appPlusHandle(paramsData, this.list[index].productId);
+					// #endif
+				}
+			},
+
+			onBridgeReady() {
+				let self = this;
+				h5OnBridgeReady(this.payData).then(() => {
+					self.handlePayResult();
+				})
+			},
+			h5AndMpHandle(paramsData) {
+				let self = this;
 				payAny(paramsData).then(res => {
 					if (res.retCode === 0) {
 						self.payData = res.data;
-						if (self.payWayList[self.payTypeIndex].payType === 8) {
+						if (self.payWayList[self.payTypeIndex].payType === 8) { //微信H5支付
 							// #ifdef H5
 							if (typeof WeixinJSBridge === "undefined") {
 								if (document.addEventListener) {
@@ -452,85 +528,43 @@
 							} else {
 								self.onBridgeReady();
 							}
-							//    #endif
-						} else if (self.payWayList[self.payTypeIndex].payType === 5) {
+							// #endif
+						} else if (self.payWayList[self.payTypeIndex].payType === 5) { //微信小程序支付
 							//    #ifdef MP-WEIXIN
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: String(res.data.timeStamp),
-								nonceStr: String(res.data.nonce_str),
-								package: String(res.data.package),
-								signType: 'MD5',
-								paySign: String(res.data.sign),
-								success: function(res1) {
-									if (res1) {
-										self.handlePayResult();
-									}
-								},
-								fail: function(err) {
-									uni.showToast({
-										title: '支付失败',
-										icon: "error",
-										duration: 2000
-									})
-								}
+							mpWeixinMiniPay(self.payData).then(() => {
+								self.handlePayResult();
 							});
-							//    #endif
+							// #endif
 						}
 					}
 				});
-				// #endif
-
-				// #ifdef APP-PLUS
+			},
+			appPlusHandle(paramsData, productId) {
+				let self = this;
 				payAny(paramsData).then(resPay => {
 					if (resPay.retCode === 0) {
 						self.payData = resPay.data;
-
 						uni.getProvider({
 							service: 'payment',
 							success: async (res) => {
-								if (self.payWayList[self.payTypeIndex].payType === 6) {
+								if (self.payWayList[self.payTypeIndex].payType === 6) { //苹果内支付
 									const iapChannel = res.providers.find((channel) => {
 										return (channel.id === 'appleiap')
 									})
-
 									if (!!iapChannel) {
 										if (self.loading == true) {
 											return;
 										}
 										self.loading = true;
 										try {
-											// 请求苹果支付
-											const transaction = await self._iap.requestPayment({
-												productid: self.list[checkedProductIndex]
-													.productId,
-												manualFinishTransaction: true,
-												username: self.payData, //根据业务需求透传参数，关联用户和订单关系
-											});
-
-											// 在此处请求开发者服务器，在服务器端请求苹果服务器验证票据
-											let result = await self.validatePaymentResult({
-												orderNo: self.payData,
-												receipt: transaction
-													.transactionReceipt, // 不可作为订单唯一标识
-											});
-
-											// 验证成功后关闭订单
-											if (result != null) {
-												await self._iap.finishTransaction(transaction);
+											iapPay(self._iap, self.payData, productId).then(() => {
 												let orderNo = self.payData;
 												self.payData = {};
 												self.payData.orderNo = orderNo;
 
 												// 支付成功
 												self.handlePayResult();
-											} else {
-												uni.showToast({
-													title: '支付失败',
-													icon: "error",
-													duration: 2000
-												})
-											}
+											});
 										} catch (e) {
 											// uni.showModal({
 											// 	// content: e.errMsg,
@@ -541,95 +575,31 @@
 											self.loading = false;
 										}
 									}
-								} else if (self.payWayList[self.payTypeIndex].payType ===
-									1) { //微信APP支付
-									const wxChannel = res.providers.find((channel) => {
+								} else if (self.payWayList[self.payTypeIndex].payType === 1 &&
+									res.providers.findIndex((channel) => {
 										return (channel.id === 'wxpay')
+									}) > -1) { //微信APP支付
+									appWeixinPay(self.payData).then(() => {
+										self.handlePayResult();
 									})
-									if (!!wxChannel) {
-										uni.requestPayment({
-											"provider": "wxpay",
-											"orderInfo": {
-												"appid": self.payData.appid,
-												"noncestr": self.payData.nonce_str,
-												"package": self.payData.package, // 固定值
-												"partnerid": self.payData.mch_id, // 微信支付商户号
-												"prepayid": self.payData.prepay_id, // 统一下单订单号 
-												"timestamp": parseInt(self.payData
-													.timestamp), // 时间戳（单位：秒）
-												"sign": self.payData
-													.sign, // 签名，这里用的 MD5/RSA 签名
-											},
-											success(res0) {
-												self.handlePayResult();
-											},
-											fail(e) {
-												uni.showToast({
-													title: '支付失败',
-													icon: "error",
-													duration: 2000
-												})
-											}
-										})
-									}
-								} else if (self.payWayList[self.payTypeIndex].payType ===
-									2) { //支付宝APP支付
-									const aliChannel = res.providers.find((channel) => {
+								} else if (self.payWayList[self.payTypeIndex].payType === 2 &&
+									res.providers.findIndex((channel) => {
 										return (channel.id === 'alipay')
+									}) > -1) { //支付宝
+
+									let payDataString = self.payData;
+									let orderInfo = payDataString.split("&orderNo=")[0];
+
+									self.payData = {};
+									self.payData.orderNo = payDataString.split("&orderNo=")[1];
+									appAliPay(orderInfo).then(() => {
+										self.handlePayResult();
 									})
-									if (!!aliChannel) {
-										let payDataString = self.payData;
-										let orderInfo = payDataString.split("&orderNo=")[0];
-
-										self.payData = {};
-										self.payData.orderNo = payDataString.split("&orderNo=")[1];
-
-										uni.requestPayment({
-											"provider": "alipay",
-											"orderInfo": orderInfo,
-											success(res0) {
-												self.handlePayResult();
-											},
-											fail(e) {
-												uni.showToast({
-													title: '支付失败',
-													icon: "error",
-													duration: 2000
-												})
-											}
-										})
-									}
 								}
-
 							},
 						});
 					}
 				});
-				// #endif
-			},
-
-			onBridgeReady() {
-				let self = this;
-				WeixinJSBridge.invoke(
-					'getBrandWCPayRequest', {
-						"appId": this.payData.appid, //公众号名称，由商户传入
-						"timeStamp": this.payData.timeStamp, //时间戳，自1970年以来的秒数
-						"nonceStr": this.payData.nonce_str, //随机串
-						"package": this.payData.package,
-						"signType": 'MD5', //微信签名方式：
-						"paySign": this.payData.sign //微信签名
-					},
-					function(result) {
-						if (result.err_msg.indexOf("get_brand_wcpay_request:ok") > -1) {
-							self.handlePayResult();
-						} else {
-							uni.showToast({
-								icon: 'error',
-								title: '支付失败！',
-								duration: 1500
-							});
-						}
-					});
 			},
 
 			// 开始准备轮询
@@ -725,10 +695,12 @@
 							self.goodsType = vo.type;
 							if (vo.type === 0) {
 								self.price = Math.round(vo.price / 1000);
+								self.title = "购买金豆";
 							} else if (vo.type === 1) {
 								self.price = Math.round(vo.price * vo.discount / 100000);
 								day = (vo.signName.indexOf("月") > -1 ? "30" : (vo.signName.indexOf("季") > -1 ?
-									"90" : "365"))
+									"90" : "365"));
+								self.title = "购买金豆卡";
 							}
 
 							self.refreshNote(vo.type, self.type, day);
@@ -762,10 +734,12 @@
 							self.goodsType = vo.type;
 							if (vo.type === 0) {
 								self.price = Math.round(vo.price / 1000);
+								self.title = "购买金豆";
 							} else if (vo.type === 1) {
 								self.price = Math.round(vo.price / 1000);
 								day = (vo.signName.indexOf("月") > -1 ? "30" : (vo.signName.indexOf("季") > -1 ?
 									"90" : "365"))
+								self.title = "购买金豆卡";
 							}
 
 							self.refreshNote(vo.type, self.type, day);
@@ -792,12 +766,14 @@
 					if (res.retCode === 0) {
 						self.list.splice(0, self.list.length);
 						res.data.forEach(v => {
+							v.type = 1;
 							v.checked = false;
 							self.list.push(v);
 						});
 						if (self.list.length > 0) {
 							self.list[0].checked = true;
 							self.price = Math.round(self.list[0].price * self.list[0].discount / 100000);
+							self.title = "购买尾货通卡";
 						}
 					}
 				});
@@ -808,12 +784,14 @@
 					if (res.retCode === 0) {
 						self.list.splice(0, self.list.length);
 						res.data.forEach(v => {
+							v.type = 1;
 							v.checked = false;
 							self.list.push(v);
 						});
 						if (self.list.length > 0) {
 							self.list[0].checked = true;
 							self.price = Math.round(self.list[0].price / 1000);
+							self.title = "购买尾货通卡";
 						}
 
 						self.listRecentIosOrder();
@@ -823,20 +801,9 @@
 			//选择支付方式
 			choosePayWay(index) {
 				this.payTypeIndex = index;
-				this.payType = this.payWayList[this.payTypeIndex].payType;
 			},
 			//iap验证是否支付成功
-			validatePaymentResult(data) {
-				return new Promise((resolve, reject) => {
-					iapPayVerify(data).then(res => {
-						if (res.retCode === 0) {
-							resolve(res.data);
-						}
-					}).catch(() => {
-						resolve(null);
-					});
-				});
-			}
+
 		},
 		beforeDestroy() {
 			clearTimeout(this.timer)

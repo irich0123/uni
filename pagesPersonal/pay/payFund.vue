@@ -56,14 +56,26 @@
 	import {
 		regex,
 		payWayConfig,
-		imgUrl,active
+		imgUrl,
+		active
 	} from "@/utils/config";
 	import {
 		getPayOrderStatus,
 		payAny
 	} from "@/api/finance";
+	
+	// #ifdef H5
+	import {
+		h5OnBridgeReady,
+	} from "@/utils/pay";
+	// #endif
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
+	import {
+		appAliPay,
+		appWeixinPay,
+		mpWeixinMiniPay,
+	} from "@/utils/pay";
 	// #endif
 
 	export default {
@@ -84,8 +96,8 @@
 				targetType: null,
 
 				payTypeIndex: null,
-				imgSelected: imgUrl+'/mall/select.png',
-				imgUnSelected: imgUrl+'/mall/noSelect.png',
+				imgSelected: imgUrl + '/mall/select.png',
+				imgUnSelected: imgUrl + '/mall/noSelect.png',
 				payWayConfig: payWayConfig,
 				payWayList: [],
 				disableSubmitBtn: true,
@@ -95,7 +107,6 @@
 				payData: {},
 
 				title: '',
-				imgUrl: imgUrl,
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
@@ -125,8 +136,17 @@
 
 			this.targetType = parseInt(options.type);
 
-			if (this.targetType == null) {
-				return;
+			if (this.targetType == null || (this.targetType !== 1 && this.targetType !== 6)) {
+				uni.showToast({
+					title: "参数错误！",
+					icon: "error",
+					duration: 2000,
+				})
+				setTimeout(() => {
+					uni.navigateBack({
+						delta: 1,
+					})
+				})
 			} else if (this.targetType === 1) {
 				// #ifdef H5
 				uni.setNavigationBarTitle({
@@ -145,9 +165,11 @@
 				// #ifndef H5
 				this.title = "充值保证金";
 				// #endif
-			} else {
-				return;
 			}
+			
+			this.payWayConfig.forEach(v=>{
+				v.active = false;
+			})
 
 			// #ifdef H5
 			this.payWayConfig.find(v => {
@@ -173,18 +195,15 @@
 			this.token = uni.getStorageSync('token')
 			this.userData = uni.getStorageSync("user");
 			this.payWayList = this.payWayConfig.filter(v => v.active);
-			
-			if(this.payWayList.length==1){
+
+			if (this.payWayList.length > 0) {
 				this.payTypeIndex = 0;
 			}
-			
+
+			console.log("payWayList=", this.payWayList);
+
 			if (!this.token) {
 				this.toLogin();
-			}
-
-			if (!!uni.getStorageSync("needRefresh")) {
-				uni.removeStorageSync("needRefresh");
-				this.initData();
 			}
 		},
 		methods: {
@@ -244,14 +263,31 @@
 				}
 
 				// #ifdef H5 | MP-WEIXIN 
+				this.h5AndMpHandle(paramsData);
+				// #endif
+
+				// #ifdef APP-PLUS
+				this.appPlusHandle(paramsData);
+				// #endif
+			},
+
+			onBridgeReady() {
+				let self = this;
+				h5OnBridgeReady(this.payData).then(() => {
+					self.handlePayResult();
+				})
+			},
+			h5AndMpHandle(paramsData) {
+				let self = this;
 				payAny(paramsData).then(res => {
 					if (res.retCode === 0) {
 						self.payData = res.data;
-						if (self.payWayList[self.payTypeIndex].payType === 8) {
+						if (self.payWayList[self.payTypeIndex].payType === 8) { //微信H5支付
 							// #ifdef H5
 							if (typeof WeixinJSBridge === "undefined") {
 								if (document.addEventListener) {
-									document.addEventListener('WeixinJSBridgeReady', self.onBridgeReady, false);
+									document.addEventListener('WeixinJSBridgeReady', self.onBridgeReady,
+										false);
 								} else if (document.attachEvent) {
 									document.attachEvent('WeixinJSBridgeReady', self.onBridgeReady);
 									document.attachEvent('onWeixinJSBridgeReady', self.onBridgeReady);
@@ -260,133 +296,49 @@
 								self.onBridgeReady();
 							}
 							// #endif
-						} else if (self.payWayList[self.payTypeIndex].payType === 5) {
-							// #ifdef MP-WEIXIN
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: String(res.data.timeStamp),
-								nonceStr: String(res.data.nonce_str),
-								package: String(res.data.package),
-								signType: 'MD5',
-								paySign: String(res.data.sign),
-								success: function(res1) {
-									console.log("success:", res1)
-									if (res1) {
-										self.handlePayResult();
-									}
-								},
-								fail: function(err) {
-									console.log("fail:", err)
-									uni.showToast({
-										title: '支付失败',
-										icon: "error",
-										duration: 2000
-									})
-								}
+						} else if (self.payWayList[self.payTypeIndex].payType === 5) { //微信小程序支付
+							//    #ifdef MP-WEIXIN
+							mpWeixinMiniPay(self.payData).then(() => {
+								self.handlePayResult();
 							});
 							// #endif
 						}
 					}
 				});
-				// #endif
-
-				// #ifdef APP-PLUS
+			},
+			appPlusHandle(paramsData) {
+				let self = this;
 				payAny(paramsData).then(resPay => {
 					if (resPay.retCode === 0) {
 						self.payData = resPay.data;
-
 						uni.getProvider({
 							service: 'payment',
 							success: async (res) => {
-								if (self.payWayList[self.payTypeIndex].payType === 1) { //微信APP支付
-									const wxChannel = res.providers.find((channel) => {
+								if (self.payWayList[self.payTypeIndex].payType === 1 &&
+									res.providers.findIndex((channel) => {
 										return (channel.id === 'wxpay')
+									}) > -1) { //微信APP支付
+									appWeixinPay(self.payData).then(() => {
+										self.handlePayResult();
 									})
-									if (!!wxChannel) {
-										uni.requestPayment({
-											"provider": "wxpay",
-											"orderInfo": {
-												"appid": self.payData.appid,
-												"noncestr": self.payData.nonce_str,
-												"package": self.payData.package, // 固定值
-												"partnerid": self.payData.mch_id, // 微信支付商户号
-												"prepayid": self.payData.prepay_id, // 统一下单订单号 
-												"timestamp": parseInt(self.payData
-													.timestamp), // 时间戳（单位：秒）
-												"sign": self.payData
-													.sign, // 签名，这里用的 MD5/RSA 签名
-											},
-											success(res0) {
-												self.handlePayResult();
-											},
-											fail(e) {
-												uni.showToast({
-													title: '支付失败',
-													icon: "error",
-													duration: 2000
-												})
-											}
-										})
-									}
-								} else if (self.payWayList[self.payTypeIndex].payType === 2) { //支付宝APP支付
-									const aliChannel = res.providers.find((channel) => {
+								} else if (self.payWayList[self.payTypeIndex].payType === 2 &&
+									res.providers.findIndex((channel) => {
 										return (channel.id === 'alipay')
+									}) > -1) { //支付宝
+
+									let payDataString = self.payData;
+									let orderInfo = payDataString.split("&orderNo=")[0];
+
+									self.payData = {};
+									self.payData.orderNo = payDataString.split("&orderNo=")[1];
+									appAliPay(orderInfo).then(() => {
+										self.handlePayResult();
 									})
-									if (!!aliChannel) {
-										let payDataString = self.payData;
-										let orderInfo = payDataString.split("&orderNo=")[0];
-
-										self.payData = {};
-										self.payData.orderNo = payDataString.split("&orderNo=")[1];
-
-										uni.requestPayment({
-											"provider": "alipay",
-											"orderInfo": orderInfo,
-											success(res0) {
-												self.handlePayResult();
-											},
-											fail(e) {
-												uni.showToast({
-													title: '支付失败',
-													icon: "error",
-													duration: 2000
-												})
-											}
-										})
-									}
 								}
-
 							},
 						});
 					}
 				});
-				// #endif
-			},
-
-			onBridgeReady() {
-				let self = this;
-				WeixinJSBridge.invoke(
-					'getBrandWCPayRequest', {
-						"appId": this.payData.appid, //公众号名称，由商户传入
-						"timeStamp": this.payData.timeStamp, //时间戳，自1970年以来的秒数
-						"nonceStr": this.payData.nonce_str, //随机串
-						"package": this.payData.package,
-						"signType": 'MD5', //微信签名方式：
-						"paySign": this.payData.sign //微信签名
-					},
-					function(result) {
-						if (result.err_msg.indexOf("get_brand_wcpay_request:ok") > -1) {
-							// 使用以上方式判断前端返回,微信团队郑重提示：
-							//res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-							self.handlePayResult();
-						} else {
-							uni.showToast({
-								icon: 'error',
-								title: '支付失败！',
-								duration: 1500
-							});
-						}
-					});
 			},
 
 			// 开始准备轮询

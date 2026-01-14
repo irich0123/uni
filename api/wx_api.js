@@ -6,7 +6,7 @@ import {
 Vue.prototype.$myRequest = myRequest
 
 /**
- * 根据infoId,InfoType获取微信分享配置信息 wxShareConfig
+ * 公众号分享首页到公众号
  */
 export const getHomePageShareConfig = () => {
 	return myRequest({
@@ -17,6 +17,8 @@ export const getHomePageShareConfig = () => {
 	})
 }
 
+
+//小程序分享详情页到公众号
 export const getInfoPageShareConfigMini = (params) => {
 	return myRequest({
 		url: '/userapi/infoShareController/config/info/page/mini',
@@ -26,8 +28,18 @@ export const getInfoPageShareConfigMini = (params) => {
 	})
 }
 
+//APP分享详情页到小程序
+export const getInfoPageShareConfigApp = (params) => {
+	return myRequest({
+		url: '/userapi/infoShareController/config/info/page/app',
+		method: 'post',
+		data: params,
+		silent: 1
+	})
+}
+
 /**
- * 获取外发承接信息分享配置
+ * 公众号分享详情页到公众号
  */
 export const getWorkInfoShareContent = (param) => {
     return myRequest({

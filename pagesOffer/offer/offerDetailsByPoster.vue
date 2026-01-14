@@ -81,8 +81,7 @@
 								验收标准：
 							</view>
 							<view>
-								{{offer.acceptanceType}}<text style="margin-left: 10rpx"
-									v-if="">{{offer.acceptanceDetails}}</text>
+								{{offer.acceptanceType}}<text style="margin-left: 10rpx">{{offer.acceptanceDetails}}</text>
 							</view>
 						</view>
 					</view>

@@ -19,18 +19,33 @@
 			// #ifdef APP-PLUS
 			plus.navigator.closeSplashscreen();
 
-			let agree = uni.getStorageSync('agree');
-			if (!!agree) {
-				initApp();
+			////  这里是安卓版本, 用了uni隐私插件，免去考虑隐私弹框的问题；
+			initApp();
 
-				uni.getSystemInfo({
-					success: (resInfo) => {
-						uni.setStorageSync("theme", resInfo.osTheme === 'light' ? 1 : 0);
-					}
-				})
-				
-				initPush();
-			}
+			uni.getSystemInfo({
+				success: (resInfo) => {
+					uni.setStorageSync("theme", resInfo
+						.osTheme === 'light' ? 1 : 0);
+				}
+			})
+
+			initPush();
+			// 这里是安卓版本 结束
+
+			// //// 这里是ios开始，编译ios版本时要取消注释行
+			// let agree = uni.getStorageSync('agree');
+			// if (!!agree) {
+			// 	initApp();
+
+			// 	uni.getSystemInfo({
+			// 		success: (resInfo) => {
+			// 			uni.setStorageSync("theme", resInfo.osTheme === 'light' ? 1 : 0);
+			// 		}
+			// 	})
+
+			// 	initPush();
+			// }
+			// //// 这里是ios结束
 			// #endif
 		},
 		onShow: function() {

@@ -220,16 +220,13 @@ function judgeIosPermission(permissionID) {
 // 跳转到**应用**的权限页面
 function gotoAppPermissionSetting() {
 	if (isIos) {
-		var UIApplication = plus.ios.import("UIApplication");
-		var application2 = UIApplication.sharedApplication();
-		var NSURL2 = plus.ios.import("NSURL");
-		// var setting2 = NSURL2.URLWithString("prefs:root=LOCATION_SERVICES");		
-		var setting2 = NSURL2.URLWithString("app-settings:");
-		application2.openURL(setting2);
+		var UIApplication = plus.ios.importClass("UIApplication");
+		var NSURL = plus.ios.importClass("NSURL");
+		var setting = NSURL.URLWithString("App-Prefs:root=com.niule.yunJiaGongNew");// 请替换NOTIFICATIONS_ID为你的应用的Bundle Identifier
+		UIApplication.sharedApplication().openURL(setting);
 
-		plus.ios.deleteObject(setting2);
-		plus.ios.deleteObject(NSURL2);
-		plus.ios.deleteObject(application2);
+		// plus.ios.deleteObject(setting2);
+		// plus.ios.deleteObject(NSURL2);
 	} else {
 		// console.log(plus.device.vendor);
 		var Intent = plus.android.importClass("android.content.Intent");

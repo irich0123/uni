@@ -496,10 +496,23 @@
 			},
 			successHandle() {
 				// #ifdef APP-PLUS 
-				jpushModule.setAlias({
-					'alias': uni.getStorageSync("deviceInfo"),
-					'sequence': 1
-				});
+
+				let deviceInfo = uni.getStorageSync("deviceInfo");
+				if (!deviceInfo) {
+					jpushModule.getRegistrationID(result => {
+						if (!!result.registerID) {
+							deviceInfo = "RID=" + result.registerID
+							uni.setStorageSync("deviceInfo", deviceInfo);
+						}
+					});
+				}
+
+				if (!!deviceInfo) {
+					jpushModule.setAlias({
+						'alias': deviceInfo,
+						'sequence': 1
+					});
+				}
 				// #endif
 				uni.showToast({
 					icon: "success",

@@ -896,7 +896,7 @@
 	}
 </script>
 
-<style scoped lang="scss" lang="scss">
+<style scoped lang="scss">
 	@import "@/static/css/tabBar.css";
 	@import "@/static/css/fab.css";
 	@import "@/static/css/loading.css";

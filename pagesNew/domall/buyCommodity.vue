@@ -159,7 +159,7 @@
 	import uniNumberBox from "../components/uni-number-box.vue"
 	import {
 		regex,
-		active
+		active,imgUrl
 	} from "@/utils/config";
 	import {
 		createTransaction,
@@ -214,6 +214,7 @@
 		},
 		data() {
 			return {
+				imgUrl: imgUrl,
 				token: null,
 				userData: {},
 
@@ -224,7 +225,8 @@
 					unitPriceBreakdown: [],
 					userDetailsInfo: {
 						avatar: null,
-					}
+					},
+					qtyInStock: 1,
 				},
 				minNumber: 1, //最先数量
 				buyNumber: 0, //购买数量

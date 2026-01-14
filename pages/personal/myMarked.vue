@@ -549,7 +549,7 @@
 						content: '是否取消收藏?',
 						success: (res1) => {
 							if (res1.confirm) {
-								if (index === 0) {
+								if (self.tabIndex === 0) {
 									this.cancelMark0(id);
 								} else if (index === 1) {
 									this.cancelMark1(id);

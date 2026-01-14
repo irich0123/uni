@@ -460,9 +460,8 @@
 		methods: {
 			navAction(e) {
 				if (e.action === 'back') {
-					let pages = getCurrentPages();
-					if (pages.length < 2) {
-						uni.switchTab({
+					if (!!this.directOpen) {
+						uni.reLaunch({
 							url: '/pages/index/index',
 						})
 					} else {

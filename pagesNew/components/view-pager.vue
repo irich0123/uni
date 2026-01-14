@@ -1,11 +1,10 @@
 <template>
 	<view>
-		<scroll-view scroll-x="true" class="scroll-view" :scroll-with-animation="true" v-if="showVP">
+		<scroll-view scroll-x="true" class="scroll-view" :scroll-with-animation="true">
 			<view @touchmove="switchPage" @touchstart="startTouch" @touchend="endTouch">
 				<slot />
 			</view>
 		</scroll-view>
-		<slot v-if="!showVP" />
 	</view>
 </template>
 
@@ -25,17 +24,11 @@
 
 				startX: 0,
 				type: 0,
-
-				showVP: false,
 			}
 		},
 		props: {
 			pageDataFun: {
 				type: Function,
-			},
-			singlePage: {
-				type: Boolean,
-				default: true,
 			},
 			params: {
 				type: Object,
@@ -45,20 +38,16 @@
 			}
 		},
 		mounted() {
-			this.showVP = !this.singlePage;
-			
-			if(this.showVP){
-				this.nodeId = this.params.id;
-				this.currentPage = this.params.page;
-				this.size = this.params.size;
-				
-				for (let key in this.params) {
-					if (key != "page" && key != "size" && key != "id") {
-						this.innerParams[key] = this.params[key];
-					}
+			this.nodeId = this.params.id;
+			this.currentPage = this.params.page;
+			this.size = this.params.size;
+
+			for (let key in this.params) {
+				if (key != "page" && key != "size" && key != "id") {
+					this.innerParams[key] = this.params[key];
 				}
-				this.loadList();
 			}
+			this.loadList();
 		},
 		methods: {
 			loadList() {

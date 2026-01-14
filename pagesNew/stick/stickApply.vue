@@ -6,7 +6,7 @@
 
 		<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'">
 			<view style="content: ''; overflow: hidden;"></view>
-			<uni-forms label-position="left" :modelValue="stickApply" border label-width="100" border>
+			<uni-forms label-position="left" :modelValue="stickApply" border label-width="100">
 				<view class="bg-white radius margin-bottom-sm">
 					<uni-forms-item label="状态：" v-if="!!stickApply.id" style="padding:0;">
 						<view>{{stickApply.status | filterStatus(that)}}</view>

@@ -157,6 +157,10 @@
 
 			this.openId = uni.getStorageSync('openId')
 
+			this.payWayConfig.forEach(v=>{
+				v.active = false;
+			})
+			
 			// #ifdef H5
 			this.payWayConfig.find(v => {
 				return v.key === 'wx-h5'

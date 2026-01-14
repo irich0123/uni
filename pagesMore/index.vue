@@ -22,6 +22,7 @@
 				<!-- #ifdef APP-PLUS -->
 				<uni-list>
 					<uni-list-item title="通知设置" :show-arrow="true" @click.native="toPushConfig" />
+					<uni-list-item title="清除角标" :show-arrow="true" @click.native="toClearBadge" v-if="hasBadge" />
 				</uni-list>
 				<!-- #endif -->
 			</view>
@@ -65,6 +66,9 @@
 <script>
 	// #ifdef APP-PLUS
 	let jpushModule = uni.requireNativePlugin("JG-JPush");
+	import {
+		gotoAppPermissionSetting
+	} from '@/js_sdk/wa-permission/permission.js'
 	// #endif
 
 	import UniListItem from "@/components/uni-list-item/uni-list-item";
@@ -84,6 +88,7 @@
 	import {
 		active
 	} from "@/utils/config";
+	import permission from "../js_sdk/wa-permission/permission";
 
 
 	export default {
@@ -108,6 +113,8 @@
 
 				withCancel: true,
 				modalName: null,
+
+				hasBadge: false,
 			}
 		},
 		watch: {
@@ -148,6 +155,17 @@
 				if (!!this.token) {
 					this.checkCancelUser()
 				}
+
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					var UIApplication = plus.ios.importClass("UIApplication");
+					var app = UIApplication.sharedApplication();
+					//获取应用图标的数量
+					var oldNum = app.applicationIconBadgeNumber();
+					if (oldNum > 0) {
+						this.hasBadge = true;
+					}
+				}
 			},
 			checkCancelUser() {
 				let self = this;
@@ -163,7 +181,12 @@
 				})
 			},
 			toPushConfig() {
-				uni.openAppAuthorizeSetting();
+				let platform = uni.getStorageSync("platform");
+				if (platform === 'ios') {
+					uni.openAppAuthorizeSetting();
+				} else {
+					gotoAppPermissionSetting();
+				}
 			},
 			toPromotionList() {
 				uni.navigateTo({
@@ -256,7 +279,17 @@
 			hideModal(e) {
 				this.modalName = null
 			},
-
+			toClearBadge() {
+				plus.runtime.setBadgeNumber(0);
+				uni.showToast({
+					title: '清除成功',
+					icon: 'none',
+					duration: 2000
+				})
+				setTimeout(() => {
+					this.hasBadge = false;
+				})
+			}
 		}
 	}
 </script>

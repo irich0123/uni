@@ -132,7 +132,7 @@
 				let param = {
 					pageType: 3, //首页
 				}
-				queryShareTemplate(param).then(res => { //这里是错误的  todo!!!
+				queryShareTemplate(param).then(res => {
 					if (res.retCode === 0 && res.data.length > 0) {
 						self.share = res.data[0];
 					}
@@ -186,9 +186,7 @@
 							return;
 						}
 
-						let img = self.imgUrl + '/share.png';
-
-						uniShare.show({
+						uniShare.show({		/// 这里要改，属于任务型的，分享后要加加金豆的 todo
 							content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
 								type: 5, //分享到小程序
 								miniProgram: {
@@ -197,7 +195,7 @@
 									type: 0,
 									webUrl: self.share.localUrl,
 								},
-								imageUrl: img,
+								imageUrl: self.share.icon,
 								href: self.share.localUrl,
 								title: '没活干就上云加工',
 								summary: '没活干就上云加工',

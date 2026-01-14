@@ -61,7 +61,8 @@
 				<!-- #endif -->
 
 				<scroll-view scroll-y class="bg-gray-1" :style="'padding-top:'+contentTop+'px;height:'+listHeight+'px;'"
-					@scroll="scrollHandle">
+					@scroll="scrollHandle" refresher-enabled="true" :refresher-triggered="triggered"
+					@refresherrefresh="onRefresh" @refresherrestore="onRestore" refresher-background="transparent">
 					<!-- 轮播图开始 -->
 					<view>
 						<home-banner :city="cityShow" />
@@ -76,7 +77,7 @@
 
 					<!-- 公告开始 -->
 					<view>
-						<notice-panel />
+						<notice-panel :key="timer" />
 					</view>
 					<!-- 公告结束 -->
 
@@ -255,7 +256,7 @@
 				],
 
 				theme: 1,
-
+				triggered: false,
 			}
 		},
 		onShow() {
@@ -293,7 +294,11 @@
 			// #endif
 
 			// #ifdef H5	
-			wxShareHomePage();
+			if (this.userData && this.userData.id) {
+				wxShareHomePage("o=t&u=" + this.userData.id);
+			} else {
+				wxShareHomePage();
+			}
 			// #endif
 
 			this.token = uni.getStorageSync("token")
@@ -338,7 +343,6 @@
 			if (urlParam.length > 0) {
 				urlParam = urlParam.slice(0, -1);
 			}
-			console.log("home index urlParam=", urlParam);
 			// #endif
 
 			// #ifdef H5 || MP-WEIXIN
@@ -389,16 +393,7 @@
 
 			this.initData();
 		},
-		// 监听用户下拉动作，一般用于下拉刷新
-		onPullDownRefresh() {
-			this.initData();
-
-			this.$nextTick(() => {
-				uni.stopPullDownRefresh();
-			});
-		},
 		onUnload() {
-			// 移除监听事件
 			// #ifdef APP-PLUS
 			uni.$off('connectStatusChange');
 			// #endif
@@ -430,7 +425,6 @@
 				// #endif
 			},
 			initData() {
-				//获取公告
 				this.initLocation();
 				this.getIndustryAll();
 			},
@@ -496,7 +490,6 @@
 						});
 						self.releaseWorkList = releaseWorkList
 						self.workOrderList = workOrderList
-
 					}
 				});
 			},
@@ -517,8 +510,6 @@
 					setTimeout(() => {
 						this.parseRegionOnIp();
 					}, this.active === 'debug' ? 1000 : 0);
-				} else {
-					console.log("没到24小时")
 				}
 
 				// #ifdef H5			
@@ -864,17 +855,28 @@
 				this.scrollOverBanner = e.detail.scrollTop > 240;
 			},
 			recordShareTask(userId) {
-				    // 云加工小程序(1), 云加工公众号(2),云招工公众号(3);
-				recordShareTasknonH5({		//非公众号以外的H5网页分享
+				recordShareTasknonH5({ //非公众号以外的H5网页分享
 					userId: userId,
 					//#ifdef H5
-					appType: 2
+					appType: 2,
 					//#endif
 					//#ifdef MP-WEIXIN
-					appType: 1
+					appType: 1,
 					//#endif
 				}).then();
-			}
+			},
+			onRefresh() {
+				if (this.triggered) return;
+				this.triggered = true;
+				this.timer++;
+				this.initData();
+				setTimeout(() => {
+					this.onRestore();
+				}, 1000);
+			},
+			onRestore() {
+				this.triggered = false;
+			},
 		},
 		// #ifdef MP-WEIXIN
 		onShareAppMessage: function(ops) {
@@ -885,23 +887,35 @@
 				// 页面内转发按钮
 				console.log(ops.target)
 			}
+			let title = "找活用【云加工】就够了";
+			let path = '/pages/index/index';
+			if (this.userData & this.userData.id) {
+				path += '?o=t&u=' + this.userData.id;
+			}
+
+			const promise = new Promise(resolve => {
+				queryShareTemplate({
+					pageType: 3 //首页
+				}).then(res => {
+					if (res.retCode === 0 && res.data.length > 0) {
+						setTimeout(() => {
+							resolve({
+								title: res.data[0].title,
+								path: path,
+								imageUrl: res.data[0].icon ? res.data[0].icon : '',
+							})
+						}, 200);
+					}
+				});
+			});
 			return {
-				title: '云加工小程序',
-				path: '/pages/index/index',
-				imageUrl: this.imgUrl + '/share.png',
-				success: function(res) {
-					console.log("转发成功:" + JSON.stringify(res));
-				},
-				fail: function(res) {
-					// 转发失败
-					console.log("转发失败:" + JSON.stringify(res));
-				}
+				promise
 			}
 		},
 		onShareTimeline() {
 			return {
 				title: '没活干，就上云加工',
-				query: 'uId==' + this.userData.id,
+				query: 'uId=' + this.userData.id,
 				imageUrl: this.imgUrl + '/share.png',
 			}
 		},

@@ -260,18 +260,6 @@ export const getAddressDetailById = (params) => {
 }
 
 
-/**
- * 获取用户的一个首选地址
- */
-export const getPrimaryAddressByUserId = (params) => {
-    return myRequest({
-        url: '/commonapi/user/by/userId',
-        method: 'POST',
-        silent: true,
-        data: params
-    })
-}
-
 
 ////////////////////用户密码///////////////////////
 

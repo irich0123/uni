@@ -19,7 +19,7 @@
 
 			<view class="bottom-text flex flex-direction">
 				<!-- #ifdef APP-PLUS -->
-				<view class="text-center text-gray-1 text-ssm text-medium">V {{appBasic.version}}</view>
+				<view class="text-center text-gray-1 text-ssm text-medium">V {{currentVersion}}</view>
 				<!-- #endif -->
 				<view class="text-center text-gray-1 text-ssm text-medium margin-top-sm margin-bottom-xs">
 					{{appBasic.copyright}}
@@ -69,6 +69,9 @@
 				listYPosition: 0,
 				listHeight: 0,
 
+				currentVersion: null,
+				currentCode: null,
+
 				appBasic: {},
 
 				linkList: [],
@@ -96,7 +99,12 @@
 				this.theme = (res.theme === 'light' ? 1 : 0);
 				uni.setStorageSync("theme", this.theme);
 			})
-			
+
+			plus.runtime.getProperty(plus.runtime.appid, info => {
+				console.log(info);
+				this.currentVersion = info.version;
+				this.currentCode = parseInt(info.versionCode);
+			});
 			// #endif
 
 			this.loadAppInfo();
@@ -141,57 +149,36 @@
 
 						// #ifdef APP-PLUS
 						let platform = uni.getStorageSync("platform");
+						
+						let versionStr = "";
+						let versonCode = 0;
+						let content = "";
 						if (platform === 'android') {
-							self.appBasic.version = self.appBasic.androidVersion;
+							versionStr = self.appBasic.androidVersion;
+							versonCode = self.appBasic.androidCode;
+							content = '检测到已有新版本 v ' + versionStr +
+								'，请至应用宝或手机厂商商店下载使用';
 						} else {
-							self.appBasic.version = self.appBasic.iosVersion;
-
+							versionStr = self.appBasic.iosVersion;
+							versonCode = self.appBasic.iosCode;
+							content = '检测到已有新版本 v ' + versionStr +
+								'，请至苹果应用商店下载使用';
 						}
-						let check = uni.getStorageSync("newAppVersion");
-						console.log("check=", check);
+						let checkTime = uni.getStorageSync("versionCheckTime");
 
-						if (!check || !check.time || check.time < (new Date().getTime() - 7 * 24 * 3600 * 1000) ||
-							check.versionCode < self.appBasic.androidCode) {
-							if (platform === 'android') {
-								plus.runtime.getProperty(plus.runtime.appid, (info) => {
-									if (self.appBasic.androidCode > parseInt(info.versionCode)) {
-										uni.showModal({
-											title: '提示',
-											content: '检测到已有新版本 v ' + self.appBasic.version +
-												'，请至应用宝或手机厂商商店下载使用',
-											showCancel: false,
-											success: function(res0) {
-												if (res0.confirm) {
-													uni.setStorageSync("newAppVersion", {
-														time: new Date().getTime(),
-														versionCode: self.appBasic
-															.androidCode,
-													})
-												} else if (res0.cancel) {}
-											}
-										});
+						if (!checkTime || checkTime < (new Date().getTime() - 3 * 24 * 3600 * 1000)) {
+							if (versonCode > self.currentCode) {
+								uni.showModal({
+									title: '提示',
+									content: content,
+									showCancel: false,
+									success: function(res0) {
+										if (res0.confirm) {
+											uni.setStorageSync("versionCheckTime", new Date()
+												.getTime())
+										} else if (res0.cancel) {}
 									}
-								})
-							} else {
-								plus.runtime.getProperty(plus.runtime.appid, (info) => {
-									if (self.appBasic.iosCode > parseInt(info.versionCode)) {
-										uni.showModal({
-											title: '提示',
-											content: '检测到已有新版本 v ' + self.appBasic.version +
-												'，请至苹果应用商店下载使用',
-											showCancel: false,
-											success: function(res0) {
-												if (res0.confirm) {
-													uni.setStorageSync("newAppVersion", {
-														time: new Date().getTime(),
-														versionCode: self.appBasic
-															.androidCode,
-													})
-												} else if (res0.cancel) {}
-											}
-										});
-									}
-								})
+								});
 							}
 						}
 						// #endif

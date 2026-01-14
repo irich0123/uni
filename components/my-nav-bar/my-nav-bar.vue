@@ -90,7 +90,6 @@
 				this.toSize();
 			},
 			toBack() {
-				console.log("back");
 				this.$emit("action", {
 					action: 'back'
 				});

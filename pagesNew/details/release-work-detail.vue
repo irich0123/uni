@@ -409,7 +409,8 @@
 
 		<!--        最新联系-->
 		<view v-show="isShowStatistic">
-			<beat-panel :node-id="releaseWork.id" :tab-index="tabIndex" :type="0" @close="closeStatistic" />
+			<beat-panel v-if="releaseWork && releaseWork.id" :node-id="releaseWork.id" :tab-index="tabIndex" :type="0"
+				@close="closeStatistic" />
 		</view>
 
 		<uni-popup class="notice_popup" ref="popup1" type="center" :animation="true">
@@ -460,8 +461,8 @@
 	// #ifdef APP-PLUS
 	import UniShare from '@/components/uni-share/js_sdk/uni-share.js';
 	import {
-		h5WebUrl
-	} from '@/utils/config';
+		getInfoPageShareConfigApp
+	} from '@/api/wx_api.js';
 	const uniShare = new UniShare();
 	// #endif
 
@@ -510,7 +511,7 @@
 
 				tabIndex: '',
 
-				releaseWorkBannerImg: null,
+				releaseWorkBannerImg: "",
 				releaseWorkThumb: null,
 
 				releaseWork: {
@@ -644,9 +645,8 @@
 		methods: {
 			navAction(e) {
 				if (e.action === 'back') {
-					let pages = getCurrentPages();
-					if (pages.length < 2) {
-						uni.switchTab({
+					if (!!this.directOpen) {
+						uni.reLaunch({
 							url: '/pages/index/index',
 						})
 					} else {
@@ -660,7 +660,7 @@
 				this.statusbarHeight = e.value;
 			},
 			initAnimation() {
-				if (!this.o && !this.fromAdmin) {
+				if (!this.directOpen && !this.fromAdmin) {
 					let tipShareLastShowTime = uni.getStorageSync("tipShareLastShowTime");
 					if (!tipShareLastShowTime || (new Date().getTime() - tipShareLastShowTime) > 2 * 60 * 60 *
 						1000) { //超过2小时
@@ -812,7 +812,7 @@
 					uni.showToast({
 						title: '此信息未生效或已失效！',
 						icon: "none",
-						duration: 1000
+						duration: 3000
 					})
 					setTimeout(() => {
 						if (!this.directOpen) {
@@ -820,11 +820,11 @@
 								delta: 1
 							});
 						} else {
-							uni.switchTab({
+							uni.reLaunch({
 								url: '/pages/index/index'
 							})
 						}
-					}, 1000)
+					}, 3000)
 				} else {
 					if (!!releaseWork.img) {
 						releaseWork.img = JSON.parse(releaseWork.img);
@@ -912,7 +912,7 @@
 
 					this.releaseWork = releaseWork;
 
-					if (this.directOpen === 's') { //由点击分享信息而来
+					if (!!this.directOpen) { //由点击分享信息而来
 						// #ifdef H5
 						this.isShowFab = true
 						// #endif
@@ -1326,22 +1326,33 @@
 							return;
 						}
 
-						let img = (self.releaseWork.img.length === 0) ? (self.imgUrl + '/login/logo.png') :
-							self.releaseWork.img[0];
-						uniShare.show({
-							content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
-								type: 0,
-								href: h5WebUrl + 'pagesNew/details/sendDetails?id=' + self.releaseWork
-									.id,
-								title: self.releaseWork.title,
-								summary: '没活干就上云加工',
-								imageUrl: img,
-							},
-							menus: menu,
-							cancelText: "取消分享",
-						}, e => { //callback
-							console.log(e);
-						})
+						getInfoPageShareConfigApp({
+							pageType: 0, // 0= 外发，1=承接 
+							infoId: self.releaseWork.id,
+						}).then(res => {
+							if (res.retCode === 0) {
+								let result = res.data;
+								uniShare.show({
+									content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
+										type: 5, //分享到小程序
+										miniProgram: {
+											id: "gh_fff781253752",
+											path: result.path,
+											type: 0,
+											webUrl: result.url,
+										},
+										imageUrl: result.icon,
+										href: result.url,
+										title: result.title,
+										summary: '没活干就上云加工',
+									},
+									menus: menu,
+									cancelText: "取消分享",
+								}, e => { //callback
+									console.log(e);
+								})
+							}
+						});
 					},
 				});
 			}

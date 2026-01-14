@@ -179,7 +179,7 @@
 				});
 			},
 			radioChange: function(evt) {
-				this.optionIndex = parseInt(evt.target.value);
+				this.optionIndex = parseInt(evt.detail.value);
 			},
 			submitData() {
 				if (null == this.optionIndex) {

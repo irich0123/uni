@@ -1,9 +1,11 @@
 <template>
 	<view class="container">
-		<view-pager :pageDataFun="pageDataFun" :params="param" @change="idChanged" :single-page="singlePage">
-			<release-work-detail :nodeId="param.id" :key="param.id" :from-admin="param.fromAdmin" v-if="showInfo"
+		<view-pager :pageDataFun="pageDataFun" :params="param" @change="idChanged" v-if="!singlePage">
+			<release-work-detail :nodeId="param.id" :key="param.id" :from-admin="param.fromAdmin"
 				:direct-open="param.o" />
 		</view-pager>
+		<release-work-detail :nodeId="param.id" :key="param.id" :from-admin="param.fromAdmin" :direct-open="param.o"
+			v-if="singlePage" />
 	</view>
 </template>
 
@@ -15,12 +17,17 @@
 		getReleaseWorkDetailsByIdAnon
 	} from "@/api/workinfo";
 	import {
-		createInfoShareRecord,infoInfoShare,
+		createInfoShareRecord,
+		infoInfoShare,
 	} from "@/api/user";
 	import {
-		getWorkInfoShareContent,getInfoPageShareConfigMini
+		getInfoPageShareConfigMini
 	} from "@/api/wx_api";
-
+	//#ifdef H5
+	import {
+		wxShareInfoPage,
+	} from "@/utils/wxPortalShare.js";
+	//#endif
 
 	export default {
 		name: "sendDetails",
@@ -37,7 +44,6 @@
 				releaseWork: {},
 				userData: {},
 
-				showInfo: false,
 				infoShare: {},
 			}
 		},
@@ -54,7 +60,7 @@
 					id: query.id != null ? parseInt(query.id) : null,
 					o: query.o == null ? '' : query.o,
 					fromAdmin: query.fromAdmin == null ? 0 : parseInt(query.fromAdmin),
-					infoShareId: query.infoShareId != null ? parseInt(query.infoShareId) : null,
+					infoShareId: !!query.infoShareId ? parseInt(query.infoShareId) : null,
 				}
 			}
 
@@ -77,8 +83,6 @@
 				let self = this;
 				getReleaseWorkDetailsByIdAnon(paramsData).then(res => {
 					if (res.retCode === 0) {
-						self.showInfo = true;
-
 						self.releaseWork = res.data;
 
 						if (!!self.releaseWork.img) {
@@ -88,12 +92,18 @@
 						}
 
 						// #ifdef H5
-						self.getShareConfig()
+						if (!!self.token) {
+							wxShareInfoPage({
+								infoId: self.releaseWork.id,
+								pageType: 0, //1---承接，0---外发
+								url: location.href.split('#')[0],
+							});
+						}
 						// #endif
 
 						//公众号或小程序 分享成功被用户点击
 						if (self.param.infoShareId) {
-							self.getInfoShare();
+							self.infoShareClicked();
 						}
 					}
 				});
@@ -108,68 +118,14 @@
 					url: '/pages/login/login'
 				})
 			},
-			//获取公众号分享配置文件
-			getShareConfig() {
-				let jweixin = require('@/components/jweixin/index.js');
-				let self = this
-				let paramsData = {
-					infoId: this.releaseWork.id,
-					pageType: 0, //1---承接，0---外发
-					infoSharer: this.userData ? this.userData.id : null,
-					projectName: 'YJG',
-					url: location.href.split('#')[0],
-				}
-				getWorkInfoShareContent(paramsData).then(res => {
-					if (res.retCode === 0) {
-						let title = res.data.title
-						let icon = res.data.icon
-						let des = res.data.content
-						let url = res.data.url
-						jweixin.config({
-							debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-							appId: res.data.appId, // 必填，公众号的唯一标识
-							timestamp: res.data.timestamp, // 必填，生成签名的时间戳
-							nonceStr: res.data.nonceStr, // 必填，生成签名的随机串
-							signature: res.data.signature, // 必填，签名
-							jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData',
-								'onMenuShareAppMessage', 'onMenuShareTimeline'
-							] // 必填，需要使用的JS接口列表
-						});
-						jweixin.ready(function() {
-							//分享到微信朋友圈（即将废弃。可以获取到用户是分享还是取消）
-							jweixin.onMenuShareTimeline({
-								title: title,
-								desc: des,
-								link: url,
-								imgUrl: icon,
-								success: function() {
-								},
-								cancel: function() {
-								}
-							})
-							//分享到微信朋友（即将废弃。可以获取到用户是分享还是取消）
-							jweixin.onMenuShareAppMessage({
-								title: title, // 分享标题
-								desc: des, // 分享描述
-								link: url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-								imgUrl: icon, // 分享图标
-								// type: '', // 分享类型,music、video或link，不填默认为link
-								// dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-								success: function() {
-								},
-								cancel: function() {
-								},
-							});
-						})
-					}
-				});
-			},
-			getInfoShare() {
+			infoShareClicked() {
 				let self = this;
-				infoInfoShare({id: this.param.infoShareId}).then(res=>{
-					if(res.retCode===0){
+				infoInfoShare({
+					id: this.param.infoShareId
+				}).then(res => {
+					if (res.retCode === 0) {
 						self.infoShare = res.data;
-						
+
 						self.createInfoShareRecord();
 					}
 				});
@@ -181,7 +137,6 @@
 					type: 0, //信息类型
 					infoSharer: this.infoShare.infoSharer, //信息分享者的ID
 				}
-				paramsData['openId'] = uni.getStorageSync('openId');
 
 				createInfoShareRecord(paramsData).then(res => {
 					if (res.retCode === 0) {}
@@ -195,8 +150,6 @@
 		// #ifdef MP-WEIXIN
 		onShareAppMessage: function() {
 			let self = this;
-			let title = "朋友！帮我点一下，平台有金豆赠送啦！";
-			let path = '/pages/index/index';
 
 			const promise = new Promise(resolve => {
 				let pa = {
@@ -215,17 +168,16 @@
 				});
 			});
 			return {
-				title: title,
-				path: path,
 				promise
 			}
 		},
-		onShareTimeline() {		//不支持promise
+		onShareTimeline() { //不支持promise
 			return {
 				title: this.releaseWork.title,
 				query: {
 					o: 's',
-					type: 0
+					type: 0,
+					id: this.releaseWork.id,
 				},
 				imageUrl: (this.releaseWork.img && this.releaseWork.img.length > 0) ? this.releaseWork.img[0] : '',
 			}

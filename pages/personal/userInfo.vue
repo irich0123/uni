@@ -258,13 +258,13 @@
 			//跳转到认证
 			personalAudit() {
 				uni.navigateTo({
-					url: '../../pagesCertification/personal/index?action=' + ((this.userData.verifyStatus !== 1) ?
+					url: '/pagesCertification/personal/index?action=' + ((this.userData.verifyStatus !== 1) ?
 						'edit' : 'view'),
 				})
 			},
 			companyAudit() {
 				uni.navigateTo({
-					url: '../../pagesCertification/enterprise/index?action=' + ((this.userData.comVerifyStatus !==
+					url: '/pagesCertification/enterprise/index?action=' + ((this.userData.comVerifyStatus !==
 							1) ?
 						'edit' : 'view'),
 				})
@@ -384,15 +384,6 @@
 					}
 				})
 			}
-		},
-		/**
-		 * 页面相关事件处理函数--监听用户下拉动作
-		 */
-		onPullDownRefresh() {
-			this.initData();
-			this.$nextTick(() => {
-				uni.stopPullDownRefresh()
-			})
 		},
 	}
 </script>

@@ -2,8 +2,8 @@
     "name" : "云加工",
     "appid" : "__UNI__21D4D02",
     "description" : "",
-    "versionName" : "3.2.4",
-    "versionCode" : 3204,
+    "versionName" : "3.2.8",
+    "versionCode" : 3208,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -14,6 +14,21 @@
         "nvueCompiler" : "uni-app",
         "nvueStyleCompiler" : "uni-app",
         "compilerVersion" : 3,
+        "privacy" : {
+            "prompt" : "template",
+            "template" : {
+                "title" : "服务协议和隐私政策",
+                "message" : "　　请你务必审慎阅读、充分理解“服务协议”和“隐私政策”各条款，包括但不限于：为了更好的向你提供服务，我们需要收集你的设备标识、操作日志等信息用于分析、优化应用性能。<br/>　　你可阅读<a href=\"https://web.yunjg.net/useragreement/index.html\">《服务协议》</a>和<a href=\"https://web.yunjg.net/privacy/index.html\">《隐私政策》</a>了解详细信息。如果你同意，请点击下面按钮开始接受我们的服务。",
+                "buttonAccept" : "我知道了",
+                "buttonRefuse" : "暂不同意",
+                "second" : {
+                    "title" : "温馨提示",
+                    "message" : "　　进入应用前，你需先同意<a href=\"https://web.yunjg.net/useragreement/index.html\">《服务协议》</a>和<a href=\"https://web.yunjg.net/privacy/index.html\">《隐私政策》</a>，否则将推出应用。",
+                    "buttonAccept" : "同意并继续",
+                    "buttonRefuse" : "退出应用"
+                }
+            }
+        },
         "nvue" : {
             "flex-direction" : "row"
         },
@@ -21,11 +36,19 @@
             "subPackages" : true
         },
         "splashscreen" : {
-            "alwaysShowBeforeRender" : false,
-            "waiting" : false,
-            "autoclose" : false,
+            //这里是为安卓版本
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
             "delay" : 0
         },
+        // "splashscreen" : {
+        //     //这里是为ios版本
+        //     "alwaysShowBeforeRender" : false,
+        //     "waiting" : false,
+        //     "autoclose" : false,
+        //     "delay" : 0
+        // },
         /* 模块配置 */
         "modules" : {
             "OAuth" : {},
@@ -60,6 +83,7 @@
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
+                "enableOAID" : false,
                 "minSdkVersion" : 23,
                 "abiFilters" : [ "arm64-v8a" ],
                 "targetSdkVersion" : 31
@@ -67,12 +91,9 @@
             /* ios打包配置 */
             "ios" : {
                 "dSYMs" : false,
-                "urltypes" : "joperateios",
-                "idfa" : true,
+                "idfa" : false,
                 "privacyDescription" : {
-                    "NSUserTrackingUsageDescription" : "请放心，开启权限不会获取您在其他站点的隐私信息，该权限仅用于标识设备并保障服务安全与提示浏览体验",
-                    "NSCameraUsageDescription" : "在发布信息、编辑相册、个人或企业认证，以及提交意见反馈时，需要调用摄像头拍照和拍摄视频，请确认",
-                    "NSPhotoLibraryUsageDescription" : "在发布信息、编辑相册、个人或企业认证，以及提交意见反馈时，需要调用相册读取，请确认"
+                    "NSUserTrackingUsageDescription" : "请放心，开启权限不会获取您在其他站点的隐私信息，该权限仅用于标识设备并保障服务安全与提示浏览体验"
                 }
             },
             /* "pushRegisterMode" : "manual"  *//* SDK配置 */
@@ -218,19 +239,19 @@
                 }
             },
             "JG-JPush" : {
-                "JPUSH_ISPRODUCTION_IOS" : "false",
+                "JPUSH_ISPRODUCTION_IOS" : "",
                 "JPUSH_ADVERTISINGID_IOS" : "",
                 "JPUSH_DEFAULTINITJPUSH_IOS" : "",
-                "JPUSH_OPPO_APPKEY" : "3nRvla5S7Qkgwwk48sGwsGogg",
-                "JPUSH_OPPO_APPID" : "3623605",
-                "JPUSH_OPPO_APPSECRET" : "DA8136a528b7c27eb5fEa042E641A469",
+                "JPUSH_OPPO_APPKEY" : "OP-3nRvla5S7Qkgwwk48sGwsGogg",
+                "JPUSH_OPPO_APPID" : "OP-3623605",
+                "JPUSH_OPPO_APPSECRET" : "OP-DA8136a528b7c27eb5fEa042E641A469",
                 "JPUSH_VIVO_APPKEY" : "4debe6733dcc2be05c9728e03b121fbd",
                 "JPUSH_VIVO_APPID" : "100174219",
                 "JPUSH_MEIZU_APPKEY" : "",
                 "JPUSH_MEIZU_APPID" : "",
-                "JPUSH_XIAOMI_APPKEY" : "5521769397468",
-                "JPUSH_XIAOMI_APPID" : "2882303761517693468",
-                "JPUSH_HUAWEI_APPID" : "100186825",
+                "JPUSH_XIAOMI_APPKEY" : "MI-5521769397468",
+                "JPUSH_XIAOMI_APPID" : "MI-2882303761517693468",
+                "JPUSH_HUAWEI_APPID" : "appid=100186825",
                 "JPUSH_HONOR_APPID" : "900768529",
                 "JPUSH_GOOGLE_API_KEY" : "",
                 "JPUSH_GOOGLE_APP_ID" : "",
@@ -344,6 +365,20 @@
                             "value" : ""
                         }
                     }
+                }
+            },
+            "DCloud-CustomPrivacy" : {
+                "__plugin_info__" : {
+                    "name" : "CustomPrivacy",
+                    "description" : "示例插件",
+                    "platforms" : "Android",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
                 }
             }
         }

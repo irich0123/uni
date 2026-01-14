@@ -11,13 +11,14 @@
 		</view>
 
 		<view class="progress flex flex-direction align-center justify-center">
-			<view v-if="days>1" class="text-theme">已连续签到{{days}}天，继续加油哦！</view>
+			<view v-if="days>0" class="text-theme">已连续签到{{days}}天，继续加油哦！</view>
 			<view class="progress-box flex align-center justify-center">
 				<view v-for="(item,index) in clockData" :key="index" class="flex align-center">
-					<view class="bg-theme" :class="item.dash===1?'short-line-bold':'short-line'"
-						v-if="item.dash!==null">&nbsp;</view>
-					<image style="width: 75rpx;height: 75rpx;" :src="(index===2 || index===6)?giftImg:pendingImg"
-						:class="item.clock>0?'':'op'" />
+					<view class="bg-theme" :class="item.dash>0?'short-line-bold':'short-line'" v-if="item.dash>0">&nbsp;
+					</view>
+					<image style="width: 75rpx;height: 75rpx;" v-if="item.clock>0" :src="(index===2 || index===6)?giftImg:clockImg" />
+					<image style="width: 75rpx;height: 75rpx;" v-else :src="pendingImg" />
+					
 				</view>
 			</view>
 		</view>
@@ -143,9 +144,9 @@
 
 						self.days = res.data.filter(v => v.clockStatus > 0).length;
 
-						let clockData = res.data.filter(v => v.clockStatus > 0);
+						// let clockData = res.data.filter(v => v.clockStatus > 0);
 
-						clockData.forEach(v => {
+						res.data.forEach(v => {
 							let item = {
 								dash: 1,
 								clock: v.clockStatus,
@@ -153,16 +154,16 @@
 							self.clockData.push(item);
 						})
 
-						for (let i = 0; i < (7 - clockData.length); i++) {
+						for (let i = self.clockData.length; i < 7; i++) {
 							self.clockData.push({
-								dash: 0,
+								dash: 1,
 								clock: 0,
 							})
 						}
-
 						if (self.clockData.length > 0) {
-							self.clockData[0].dash = null;
+							self.clockData[0].dash = 0;
 						}
+						console.log(self.clockData);
 					}
 				});
 			}

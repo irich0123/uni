@@ -8,9 +8,9 @@
 			:style="'padding-top:'+contentTop+'px;'" select-class="text-theme"></wuc-tab>
 
 		<!--        信息列表开始-->
-		<scroll-view class="bg-gray-1" scroll-y :style="'height:'+listHeight+'px;'"
-			@scrolltolower="loadMoreData" refresher-enabled="true" :refresher-triggered="triggered"
-			@refresherrefresh="onRefresh" @refresherrestore="onRestore" refresher-background="transparent">
+		<scroll-view class="bg-gray-1" scroll-y :style="'height:'+listHeight+'px;'" @scrolltolower="loadMoreData"
+			refresher-enabled="true" :refresher-triggered="triggered" @refresherrefresh="onRefresh"
+			@refresherrestore="onRestore" refresher-background="transparent">
 			<!--列表开始-->
 			<uni-list :border="false">
 				<uni-list-item v-for="(item,index) in tabBars[tabIndex].list" :key="index" :show-arrow="false"
@@ -34,7 +34,7 @@
                                                 || item.statusCode === '201' || item.statusCode === '210' || item.statusCode === '212'
                                                 || item.statusCode === '301' || item.statusCode === '321'
                                                 || item.statusCode === '401' || item.statusCode === '411'"
-										@click.stop="cancelTransaction(item.id,item.statusCode,'two','two','two')">
+										@click.stop="cancelTransaction(item.id,item.statusCode)">
 										取消
 									</view>
 									<view
@@ -54,7 +54,7 @@
 									<view
 										class="margin-left-ssm padding-lr padding-tb-ssm radius-xl gray-border-1 text-sm"
 										v-if="item.statusCode === '100' || item.statusCode === '110'"
-										@click.stop="goToPaymentDeposit(item.id,item.firstPartDepositRequire,item.workInfoNo)">
+										@click.stop="goToPaymentDeposit(item.id,item.firstPartDepositRequire)">
 										交保证金
 									</view>
 									<view
@@ -152,13 +152,9 @@
 			</text>
 		</scroll-view>
 
-		<jp-pwd ref="jpPwds" @completed="completed" @inputPwd="inputPwd" :money="pwd.money" :payType="pwd.payType"
-			:keyType="pwd.keyType" @forget="forgetPass" :pawType="pwd.pawType" :tite="pwd.title"
-			:contents="pwd.contents" :cancelType="pwd.cancelType" :keep="pwd.keep" :msg="pwd.msg" :places="pwd.places"
-			contentsColor="#555" :keyImg="keyImg" :topImg="topImg" :isPwy="pwd.isPwy" titeColor="#fb5318"></jp-pwd>
-
-		<passkeyboard :show="keyboardShow" :payType="payType" :money="payMoney.toFixed(2)" @password="password"
-			:isIphoneX="false" @close="close"></passkeyboard>
+		<jp-pwd ref="jpPwds" @completed="completed" @forget="forgetPass" :payType="pwd.payType" style="z-index: 99;"
+			:keyType="pwd.keyType" :pawType="pwd.pawType" :tite="pwd.title" :contents="pwd.contents" :cancel-type="true"
+			:keep="pwd.keep" :places="pwd.places" contentsColor="#555" :isPwy="pwd.isPwy" titeColor="#fb5318"></jp-pwd>
 
 
 		<!--       发货弹出框-->
@@ -246,7 +242,6 @@
 	import jpPwd from '@/components/jp-pwd/jp-pwd.vue';
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	import uniPopupDialogTextArea from "@/components/uni-popup/uni-popup-dialog-text-area";
-	import passkeyboard from '@/components/yzc-paykeyboard/yzc-paykeyboard.vue';
 	import UniList from "@/components/uni-list/uni-list";
 	import UniListItem from "@/components/uni-list-item/uni-list-item";
 	import wucTab from "@/components/wuc-tab/wuc-tab";
@@ -275,7 +270,8 @@
 	// #endif
 
 	import {
-		publicKey,active
+		publicKey,
+		active
 	} from "@/utils/config";
 
 	const jsEncrypt = require('@/utils/jsencrypt')
@@ -287,7 +283,6 @@
 		components: {
 			WorkTransactionListCell,
 			jpPwd,
-			passkeyboard,
 			uniPopup,
 			UniList,
 			UniListItem,
@@ -340,8 +335,6 @@
 				token: '',
 				userData: {},
 
-				payType: 5, //保证金
-
 				id: null,
 				waybill: '', //运单号
 				carrier: '',
@@ -352,25 +345,22 @@
 				voucherType: null, //凭证类型  1付款 2收款
 				voucherTitle: '支付凭证',
 
-				keyImg: '',
-				topImg: '',
 				pwd: {
-					money: 100, //支付金额
 					payType: 'two', //支付样式  one two
-					keyType: 'one', //键盘样式  one two
+					keyType: 'two', //键盘样式  one two
 					pawType: 'one', //输入框样式  one two
 					title: '系统提示', //标题
-					contents: '请输入支付密码，以确认是本人操作！', //提示
-					cancelType: false, //是否输入完密码后消失
+					contents: '请输入支付密码', //提示
 					keep: true, //点击遮挡是否关闭
-					msg: '', // 密码错误提示语
 					places: 6,
 					isPwy: true
 				},
 
-				keyboardShow: false,
-				payPassword: null,
+				statusCode: null,
+				
 				payMoney: 0, //需要支付的保证金
+				totalMoney: 0, //总保证金
+				freezeMoney: 0, //被冻结的保证金
 
 				uploadImgList: [], //图片链接,
 
@@ -502,7 +492,7 @@
 			//查看延期申请
 			checkDelayApply(id) {
 				uni.navigateTo({
-					url: '../../pagesOffer/contract/applyPostpone?contractId=' + id + '&type=0'
+					url: '/pagesOffer/contract/applyPostpone?contractId=' + id + '&type=0'
 				})
 			},
 			//确认验收成品
@@ -680,109 +670,36 @@
 					});
 				}
 			},
-			password(e) {
-				this.payPassword = e
-				if (this.payPassword) {
-					this.submitPay()
-				} else {
-					uni.showToast({
-						title: '请输入支付密码',
-						icon: "none",
-						duration: 1500
-					})
-				}
-			},
-			submitPay() {
-				let paramsData = {
-					contractId: this.id,
-					amount: this.payMoney * 1000,
-					deviceType: 2,
-					password: jse.encrypt(this.payPassword),
-				}
 
-				let self = this;
-				payDeposit(paramsData).then(res => {
-					if (res.retCode === 0) {
-						uni.showToast({
-							title: "交保证金成功！",
-							icon: "none",
-							duration: 2000
-						})
-						setTimeout(() => {
-							self.tabIndex[self.tabIndex].page = 1;
-							self.loadData()
-						}, 2000)
-					}
-				});
-			},
-
-			close() {
-				this.keyboardShow = false
-			},
 			//取消时输入密码后
 			completed(e) {
-				let paramsData = {
-					deviceType: 2,
-					password: jse.encrypt(e),
-				}
-				let self = this;
-				verUserPassword(paramsData).then(res => {
-					if (res.retCode === 0) {
-						if (this.statusCode === '010') {
-							let params = {
-								contractId: self.id,
-								responsibleUserUserType: 1 //甲方
-							}
-							cancelContractApply(params).then(res0 => {
-								if (res0.retCode === 0) {
-									uni.showToast({
-										title: '取消成功！',
-										icon: "none",
-										duration: 2000
-									})
-									self.$refs.jpPwds.backs()
-									self.$refs.jpPwds.toCancel()
-									setTimeout(() => {
-										self.tabBars[self.tabIndex].page = 1;
-										self.loadData()
-									}, 2000);
-								}
-							});
-						} else if (self.statusCode === '100' || self.statusCode === '110' || self.statusCode ===
-							'101' || self.statusCode === '001') { //取消交易，不需要赔偿金
-							uni.navigateTo({
-								url: '../../pagesOffer/contract/cancelReason?contractId=' + self.id +
-									'&processType=deposit&reasonType=1'
-							})
-						} else if (self.statusCode === '201' || self.statusCode === '210' || self.statusCode ===
-							'212' || self.statusCode === '221') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '../../pagesOffer/contract/cancelReason?contractId=' + self.id +
-									'&processType=sample&reasonType=1&isShowMoney=1'
-							})
-						} else if (self.statusCode === '301' || self.statusCode === '321') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '../../pagesOffer/contract/cancelReason?contractId=' + self.id +
-									'&processType=metal&reasonType=1&isShowMoney=1'
-							})
-						} else if (self.statusCode === '401' || self.statusCode === '411') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '../../pagesOffer/contract/cancelReason?contractId=' + self.id +
-									'&processType=product&reasonType=1&isShowMoney=1'
-							})
-						}
-						self.$refs.jpPwds.backs();
-						self.$refs.jpPwds.toCancel();
+				if (e) {
+					let paramsData = {
+						contractId: this.id,
+						amount: this.payMoney * 1000,
+						deviceType: 2,
+						password: jse.encrypt(e),
 					}
-				});
-			},
-			inputPwd() {
-				this.pwd.msg = ''
+					let self = this;
+					payDeposit(paramsData).then(res => {
+						if (res.retCode === 0) {
+							uni.showToast({
+								title: "交保证金成功！",
+								icon: "none",
+								duration: 2000
+							})
+							setTimeout(() => {
+								self.tabIndex[self.tabIndex].page = 1;
+								self.loadData()
+							}, 2000)
+						}
+					});
+				}
 			},
 			//跳转到交易详情
 			toItemDetail(id) {
 				uni.navigateTo({
-					url: '../../pagesOffer/contract/transactionDetails?id=' + id + '&type=0'
+					url: '/pagesOffer/contract/transactionDetails?id=' + id + '&type=0'
 				})
 			},
 			//删除交易
@@ -809,17 +726,66 @@
 				})
 			},
 			//取消交易
-			cancelTransaction(id, statusCode, payType, keyType, pawType, img1, img2) {
+			cancelTransaction(id, statusCode) {
 				this.id = id
 				this.statusCode = statusCode
-				this.pwd.isPwy = true
-				this.topImg = img1 || ''
-				this.keyImg = img2 || ''
-				// this.pwd.payType = payType
-				this.pwd.keyType = keyType
-				this.pwd.pawType = pawType
-				this.pwd.places = 6
-				this.$refs.jpPwds.toOpen()
+
+				let self = this;
+
+				uni.showModal({
+					title: "系统提示",
+					content: '是否确定取消合同吗？',
+					cancelText: '取消',
+					confirmText: '确定',
+					confirmColor: '#fb5318',
+					success: function(res1) {
+						if (res1.confirm) {
+							if (self.statusCode === '010') {
+								let params = {
+									contractId: self.id,
+									responsibleUserUserType: 1 //甲方
+								}
+								cancelContractApply(params).then(res0 => {
+									if (res0.retCode === 0) {
+										uni.showToast({
+											title: '取消成功！',
+											icon: "none",
+											duration: 2000
+										})
+										setTimeout(() => {
+											self.tabBars[self.tabIndex].page = 1;
+											self.loadData()
+										}, 2000);
+									}
+								});
+							} else if (self.statusCode === '100' || self.statusCode === '110' || self
+								.statusCode ===
+								'101' || self.statusCode === '001') { //取消交易，不需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self.id +
+										'&processType=deposit&reasonType=1'
+								})
+							} else if (self.statusCode === '201' || self.statusCode === '210' || self
+								.statusCode ===
+								'212' || self.statusCode === '221') { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self.id +
+										'&processType=sample&reasonType=1&isShowMoney=1'
+								})
+							} else if (self.statusCode === '301' || self.statusCode === '321') { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self.id +
+										'&processType=metal&reasonType=1&isShowMoney=1'
+								})
+							} else if (self.statusCode === '401' || self.statusCode === '411') { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self.id +
+										'&processType=product&reasonType=1&isShowMoney=1'
+								})
+							}
+						}
+					}
+				})
 			},
 			disagreeReasonConfirmed(action, val) {
 				let paramsData = {
@@ -946,22 +912,38 @@
 				})
 			},
 			//跳转到交保证金页面
-			goToPaymentDeposit(id, firstPartDepositRequire, workInfoNo) {
+			goToPaymentDeposit(id, money) {
+				// #ifdef H5 || MP-WEIXIN
 				this.loadUserData({
 					id: id,
-					firstPartDepositRequire: firstPartDepositRequire,
-					workInfoNo: workInfoNo,
+					money: money,
 				});
+				// #endif
+				// #ifdef APP-PLUS
+				let platform = uni.getStorageSync("platform");
+				if (platform === "ios") {
+					uni.showModal({
+						title: "系统提示",
+						content: '请使用其他客户端充值',
+						showCancel: false,
+						confirmText: '我知道了',
+						confirmColor: '#fb5318',
+					})
+				} else {
+					this.loadUserData({
+						id: id,
+						money: money,
+					});
+				}
+				// #endif
 			},
 			submitDeposit(param) {
 				//如果保证金总额减去冻结的保证金大于应支付的保证金金额，则直接输入支付密码扣除
-				if ((this.totalMoney - this.freezeMoney) > (param.firstPartDepositRequire / 1000)) {
+				if ((this.totalMoney - this.freezeMoney) > (param.money / 1000)) {
 					this.id = param.id
-					this.payMoney = (param.firstPartDepositRequire / 1000)
-					this.payPassword = ''
-					this.keyboardShow = true
+					this.payMoney = (param.money / 1000)
+					this.$refs.jpPwds.toOpen();
 				} else { //小于则跳转到缴纳保证金页面
-					console.log("跳转缴纳")
 					uni.navigateTo({
 						url: '../pay/paymentDeposit?contractId=' + param.id
 					})
@@ -984,7 +966,7 @@
 			goToContractDetails(id) {
 				//type=0 ---- 甲方，发活方；type=1 ---乙方，接活方
 				uni.navigateTo({
-					url: '../../pagesOffer/contract/contractDetails?id=' + id + '&type=0'
+					url: '/pagesOffer/contract/contractDetails?id=' + id + '&type=0'
 				})
 			},
 			//打电话
@@ -1081,8 +1063,9 @@
 				})
 			},
 			forgetPass() {
+				this.$refs.jpPwds.toCancel();
 				uni.navigateTo({
-					url: '../pay/setPayPassword',
+					url: '/pagesPersonal/pay/setPayPassword',
 				})
 			},
 			otherFun(object) { //选择地址后的数据收集

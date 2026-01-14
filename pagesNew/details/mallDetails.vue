@@ -1,9 +1,10 @@
 <template>
 	<view class="container">
-		<view-pager :pageDataFun="pageDataFun" :params="param" @change="idChanged" :single-page="singlePage">
-			<commodity-detail :node-id="param.id" :key="param.id" :fromAdmin="param.fromAdmin" :direct-open="param.o"
-				v-if="showInfo" />
+		<view-pager :pageDataFun="pageDataFun" :params="param" @change="idChanged" v-if="!singlePage">
+			<commodity-detail :node-id="param.id" :key="param.id" :fromAdmin="param.fromAdmin" :direct-open="param.o"/>
 		</view-pager>
+		<commodity-detail :node-id="param.id" :key="param.id" :fromAdmin="param.fromAdmin" :direct-open="param.o"
+			v-if="singlePage" />
 	</view>
 </template>
 
@@ -33,8 +34,6 @@
 				singlePage: true,
 				commodity: {},
 				userData: {},
-
-				showInfo: false,
 			}
 		},
 		onLoad(query) {
@@ -78,8 +77,6 @@
 				let self = this;
 				getCommodityById(paramsData).then(res => {
 					if (res.retCode === 0) {
-						self.showInfo = true;
-						
 						let commodity = res.data;
 
 						if (!!commodity.photos) {
@@ -88,7 +85,7 @@
 							commodity.photos = [];
 						}
 						self.commodity = commodity;
-						
+
 						// #ifdef H5
 						self.getShareConfig()
 						// #endif
@@ -117,7 +114,7 @@
 							jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData',
 								'onMenuShareAppMessage', 'onMenuShareTimeline'
 							] // 必填，需要使用的JS接口列表
-			
+
 						});
 						jweixin.ready(function() {
 							//分享到微信朋友圈（即将废弃。可以获取到用户是分享还是取消）
@@ -125,24 +122,22 @@
 								title: self.commodity.title,
 								desc: des,
 								link: url,
-								imgUrl: self.commodity.photos.length>0?self.commodity.photos[0]:null,
-								success: function() {
-								},
-								cancel: function() {
-								}
+								imgUrl: self.commodity.photos.length > 0 ? self.commodity.photos[
+									0] : null,
+								success: function() {},
+								cancel: function() {}
 							})
 							//分享到微信朋友（即将废弃。可以获取到用户是分享还是取消）
 							jweixin.onMenuShareAppMessage({
 								title: self.commodity.title, // 分享标题
 								desc: des, // 分享描述
 								link: url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-								imgUrl: self.commodity.photos.length>0?self.commodity.photos[0]:null, // 分享图标
+								imgUrl: self.commodity.photos.length > 0 ? self.commodity.photos[
+									0] : null, // 分享图标
 								// type: '', // 分享类型,music、video或link，不填默认为link
 								// dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-								success: function() {
-								},
-								cancel: function() {
-								},
+								success: function() {},
+								cancel: function() {},
 							});
 						})
 					}
@@ -155,8 +150,6 @@
 		// #ifdef MP-WEIXIN
 		onShareAppMessage: function(ops) {
 			let self = this;
-			let title = "朋友！帮我点一下，平台有金豆赠送啦！";
-			let path = '/pages/index/index';
 
 			const promise = new Promise(resolve => {
 				let pa = {
@@ -175,8 +168,6 @@
 				});
 			});
 			return {
-				title: title,
-				path: path,
 				promise
 			}
 		},
@@ -185,7 +176,8 @@
 				title: this.commodity.title,
 				query: {
 					o: 's',
-					type: 2
+					type: 2,
+					id: this.commodity.id,
 				},
 				imageUrl: (this.commodity.photos && this.commodity.photos.length > 0) ? this.commodity.photos[0] : '',
 			}

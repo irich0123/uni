@@ -1,11 +1,19 @@
 const localEnv = 1; //0=开发环境 1=生产环境
+//ios打包和安卓打包时。要修改
+//1 manifest.json splashscreen部分
+//2 pages.json 第一个page 
+//3 app.vue onLaunch部分
+
+const webUrl = "https://web.yunjg.net";
+const h5WebUrl = webUrl + "/wxyunjg/#/"
+const imgUrl = "https://img.yunjg.net/wxyunjg_img";
 
 module.exports = {
 	active: localEnv === 0 ? 'debug' : 'prod',
 	baseUrl: localEnv === 0 ? "https://api.nx.yunjg.net" : "https://server.yunjg.net",
-	h5WebUrl: "https://web.yunjg.net/wxyunjg/#/",
-	imgUrl: "https://img.yunjg.net/wxyunjg_img",
-	webUrl: "https://web.yunjg.net",
+	webUrl: webUrl,
+	h5WebUrl: h5WebUrl,
+	imgUrl: imgUrl,
 
 	luxury: 1,
 
@@ -28,49 +36,49 @@ module.exports = {
 			key: 'wx-app',
 			name: '微信支付',
 			payType: 1,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/wechat.png',
+			img: imgUrl +'/mall/wechat.png',
 			active: false,
 		},
 		{
 			key: 'ali-app',
 			name: '支付宝',
 			payType: 2,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/ic_zhifubao.png',
+			img: imgUrl +'/mall/ic_zhifubao.png',
 			active: false,
 		},
 		{
 			key: 'balance',
 			name: '余额支付',
 			payType: 3,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/balance.png',
+			img: imgUrl +'/mall/balance.png',
 			active: false,
 		},
 		{
 			key: 'bean',
 			name: '金豆支付',
 			payType: 4,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/bean.png',
+			img: imgUrl +'/mall/bean.png',
 			active: false,
 		},
 		{
 			key: 'wx-mini',
 			name: '微信支付',
 			payType: 5,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/wechat.png',
+			img: imgUrl +'/mall/wechat.png',
 			active: false,
 		},
 		{
 			key: 'ios-iap',
 			name: '苹果应用内支付',
 			payType: 6,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/iap.png',
+			img: imgUrl +'/mall/iap.png',
 			active: false,
 		},
 		{
 			key: 'wx-h5',
 			name: '微信支付',
 			payType: 8,
-			img: 'https://img.yunjg.net/wxyunjg_img/mall/wechat.png',
+			img: imgUrl +'/mall/wechat.png',
 			active: false,
 		}
 	],

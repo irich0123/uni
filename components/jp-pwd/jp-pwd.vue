@@ -1,13 +1,15 @@
 <template>
 	<view class="wallet_class" :class="type?'wallet_class_kq':'wallet_class_gb'" v-if="topayPwds">
 		<view style="width: 750rpx;height: 100vh;" @tap="toCancel" v-if="keep"></view>
-		<view v-if="payType==='one'" class="wallet_content" :class="type?'wallet_kq':'wallet_gb'" :style="'background-image: url('+keyImg+ ')'">
+		<view v-if="payType==='one'" class="wallet_content" :class="type?'wallet_kq':'wallet_gb'"
+			:style="'background-image: url('+keyImg+ ')'">
 			<!-- 头部 -->
 			<view class="wallet_content_tb" :style="keyImg?'':'background-image: url('+topImg+')'">
 				<view style="width: 100rpx;">
 				</view>
 				<view style="width: 550rpx;text-align: center;" :style="'color:'+ titeColor">{{tite}}</view>
-				<view style="width: 100rpx;text-align: center;font-size: 32rpx;" @tap="toCancel" :style="'color:'+ titeColor">
+				<view style="width: 100rpx;text-align: center;font-size: 32rpx;" @tap="toCancel"
+					:style="'color:'+ titeColor">
 					×
 				</view>
 			</view>
@@ -24,41 +26,43 @@
 					</view>
 				</view>
 				<view class="forget_text">
-					<view :style="'color:'+ msgsColor">{{msgs}}</view>
+					<view :style="'color:'+ msgsColor">{{msg}}</view>
 					<view :style="'color:'+ forgetNameColor" @tap="forget">{{forgetName}}</view>
 				</view>
 				<view class="jp_hea" :style="keyImg?'':'background-color: #f5f5f5'">
 					<view :class="keyType=='one'?'jq_key':'jq_key2'">
-						<view @touchend="inputPwd(list[1])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[1]"
-						 hover-class="click_hover">{{list[1]}}</view>
-						<view @touchend="inputPwd(list[2])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[2]"
-						 hover-class="click_hover">{{list[2]}}</view>
-						<view @touchend="inputPwd(list[3])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[3]"
-						 hover-class="click_hover">{{list[3]}}</view>
+						<view @touchend="inputPwd(list[1])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[1]" hover-class="click_hover">{{list[1]}}</view>
+						<view @touchend="inputPwd(list[2])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[2]" hover-class="click_hover">{{list[2]}}</view>
+						<view @touchend="inputPwd(list[3])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[3]" hover-class="click_hover">{{list[3]}}</view>
 					</view>
 					<view :class="keyType=='one'?'jq_key':'jq_key2'">
-						<view @touchend="inputPwd(list[4])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[4]"
-						 hover-class="click_hover">{{list[4]}}</view>
-						<view @touchend="inputPwd(list[5])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[5]"
-						 hover-class="click_hover">{{list[5]}}</view>
-						<view @touchend="inputPwd(list[6])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[6]"
-						 hover-class="click_hover">{{list[6]}}</view>
+						<view @touchend="inputPwd(list[4])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[4]" hover-class="click_hover">{{list[4]}}</view>
+						<view @touchend="inputPwd(list[5])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[5]" hover-class="click_hover">{{list[5]}}</view>
+						<view @touchend="inputPwd(list[6])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[6]" hover-class="click_hover">{{list[6]}}</view>
 					</view>
 					<view :class="keyType=='one'?'jq_key':'jq_key2'">
-						<view @touchend="inputPwd(list[7])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[7]"
-						 hover-class="click_hover">{{list[7]}}</view>
-						<view @touchend="inputPwd(list[8])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[8]"
-						 hover-class="click_hover">{{list[8]}}</view>
-						<view @touchend="inputPwd(list[9])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[9]"
-						 hover-class="click_hover">{{list[9]}}</view>
+						<view @touchend="inputPwd(list[7])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[7]" hover-class="click_hover">{{list[7]}}</view>
+						<view @touchend="inputPwd(list[8])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[8]" hover-class="click_hover">{{list[8]}}</view>
+						<view @touchend="inputPwd(list[9])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[9]" hover-class="click_hover">{{list[9]}}</view>
 					</view>
 					<view :class="keyType=='one'?'jq_key':'jq_key2'">
 						<view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view>
-						<view @touchend="inputPwd(list[0])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[0]"
-						 hover-class="click_hover">{{list[0]}}</view>
-						<view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view>
-<!--						<view @touchend="backspace()" class="keyboard" :style="keyImg?'':'background-color: #fff'" data-char="×"-->
-<!--						 hover-class="click_hover">×</view>-->
+						<view @touchend="inputPwd(list[0])" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							:data-char="list[0]" hover-class="click_hover">{{list[0]}}</view>
+						<!-- <view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view> -->
+						<view @touchend="backspace()" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+							data-char="×" hover-class="click_hover">
+							<image style="width:60rpx;height:60rpx" :src="imgUrl+ '/mall/del.png'" mode="aspectFill" />
+						</view>
 					</view>
 				</view>
 			</view>
@@ -78,9 +82,6 @@
 				<view class="contents" :style="'color:'+ contentsColor">
 					{{contents}}
 				</view>
-<!--				<view class="money">-->
-<!--					￥{{money}}-->
-<!--				</view>-->
 				<view class="pay-pwd-input" v-if="pawType==='one'">
 					<view class="pay-pwd-grid uni-flex uni-row" v-for="(value, index) in payPwdGrid" :key="index">
 						<view :style="'width:'+ width2 + 'rpx'">{{value.text}}</view>
@@ -92,7 +93,7 @@
 					</view>
 				</view>
 				<view class="forget_text">
-					<view :style="'color:'+ msgsColor">{{msgs}}</view>
+					<view :style="'color:'+ msgsColor">{{msg}}</view>
 					<view :style="'color:'+ forgetNameColor" @tap="forget">{{forgetName}}</view>
 				</view>
 			</view>
@@ -100,36 +101,49 @@
 				<view class="capsule">
 					<view class="jp_hea" :style="keyImg?'':'background-color: #f5f5f5'">
 						<view :class="keyType=='one'?'jq_key':'jq_key2'">
-							<view @touchend="inputPwd(list[1])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[1]"
-							 hover-class="click_hover">{{list[1]}}</view>
-							<view @touchend="inputPwd(list[2])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[2]"
-							 hover-class="click_hover">{{list[2]}}</view>
-							<view @touchend="inputPwd(list[3])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[3]"
-							 hover-class="click_hover">{{list[3]}}</view>
+							<view @touchend="inputPwd(list[1])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[1]"
+								hover-class="click_hover">{{list[1]}}</view>
+							<view @touchend="inputPwd(list[2])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[2]"
+								hover-class="click_hover">{{list[2]}}</view>
+							<view @touchend="inputPwd(list[3])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[3]"
+								hover-class="click_hover">{{list[3]}}</view>
 						</view>
 						<view :class="keyType=='one'?'jq_key':'jq_key2'">
-							<view @touchend="inputPwd(list[4])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[4]"
-							 hover-class="click_hover">{{list[4]}}</view>
-							<view @touchend="inputPwd(list[5])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[5]"
-							 hover-class="click_hover">{{list[5]}}</view>
-							<view @touchend="inputPwd(list[6])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[6]"
-							 hover-class="click_hover">{{list[6]}}</view>
+							<view @touchend="inputPwd(list[4])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[4]"
+								hover-class="click_hover">{{list[4]}}</view>
+							<view @touchend="inputPwd(list[5])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[5]"
+								hover-class="click_hover">{{list[5]}}</view>
+							<view @touchend="inputPwd(list[6])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[6]"
+								hover-class="click_hover">{{list[6]}}</view>
 						</view>
 						<view :class="keyType=='one'?'jq_key':'jq_key2'">
-							<view @touchend="inputPwd(list[7])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[7]"
-							 hover-class="click_hover">{{list[7]}}</view>
-							<view @touchend="inputPwd(list[8])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[8]"
-							 hover-class="click_hover">{{list[8]}}</view>
-							<view @touchend="inputPwd(list[9])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[9]"
-							 hover-class="click_hover">{{list[9]}}</view>
+							<view @touchend="inputPwd(list[7])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[7]"
+								hover-class="click_hover">{{list[7]}}</view>
+							<view @touchend="inputPwd(list[8])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[8]"
+								hover-class="click_hover">{{list[8]}}</view>
+							<view @touchend="inputPwd(list[9])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[9]"
+								hover-class="click_hover">{{list[9]}}</view>
 						</view>
 						<view :class="keyType=='one'?'jq_key':'jq_key2'">
 							<view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view>
-							<view @touchend="inputPwd(list[0])" class="keyboard" :style="keyImg?'':'background-color: #fff'" :data-char="list[0]"
-							 hover-class="click_hover">{{list[0]}}</view>
-							<view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view>
-<!--							<view @touchend="backspace()" class="keyboard" :style="keyImg?'':'background-color: #fff'" data-char="×"-->
-<!--							 hover-class="click_hover">×</view>-->
+							<view @touchend="inputPwd(list[0])" class="keyboard"
+								:style="keyImg?'':'background-color: #fff'" :data-char="list[0]"
+								hover-class="click_hover">{{list[0]}}</view>
+							<!-- <view class="keyboard" :style="keyImg?'':'background-color: #fff'"></view> -->
+							<view @touchend="backspace" class="keyboard" :style="keyImg?'':'background-color: #fff'"
+								data-char="×" hover-class="click_hover">
+								<image style="width:60rpx;height:60rpx" :src="imgUrl+ '/mall/del.png'"
+									mode="aspectFill" />
+							</view>
 						</view>
 					</view>
 				</view>
@@ -139,6 +153,9 @@
 </template>
 
 <script>
+	import {
+		imgUrl,
+	} from "@/utils/config";
 	export default {
 		name: 'wallet_category',
 		props: {
@@ -184,7 +201,7 @@
 			},
 			msg: { // 密码错误提示语
 				type: String,
-				default: '密码错误'
+				default: ''
 			},
 			msgsColor: {
 				type: String,
@@ -224,17 +241,17 @@
 				width1: 70,
 				width2: 60,
 				topayPwds: false,
-				msgs: '',
 				type: true,
 				password: [],
 				payPwdGrid: [],
-				list:[0,1,2,3,4,5,6,7,8,9]
+				list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+				imgUrl: imgUrl,
 			}
 		},
 		mounted() {
-			if(this.random){
+			if (this.random) {
 				this.list.sort(function() {
-				    return (0.5-Math.random());
+					return (0.5 - Math.random());
 				});
 			}
 			this.width1 = (750 - 190) / this.places
@@ -244,21 +261,6 @@
 				this.payPwdGrid.push({
 					text: ''
 				})
-			}
-		},
-		watch: {
-			msg() {
-				this.msgs = this.msg
-			},
-			places() {
-				this.width1 = (750 - 190) / this.places
-				this.width2 = (690 - 190) / this.places
-				this.payPwdGrid = []
-				for (let a = 0; a < this.places; a++) {
-					this.payPwdGrid.push({
-						text: ''
-					})
-				}
 			}
 		},
 		methods: {
@@ -281,26 +283,19 @@
 			/* 小键盘输入 */
 			inputPwd(e) {
 				let char = e;
-				let args = {
-					target: this,
-					data: char
-				};
+				this.password.push(char);
 				let passIndex = this.password.length;
 				if (passIndex < this.places) {
-					this.password.push(char);
-					if(this.isPwy){
-						this.payPwdGrid[passIndex].text = "●";
-					}else{
-						this.payPwdGrid[passIndex].text = char;
+					if (this.isPwy) {
+						this.payPwdGrid[passIndex - 1].text = "●";
+					} else {
+						this.payPwdGrid[passIndex - 1].text = char;
 					}
 					this.$emit('inputPwd', char);
-					// 改变密码框
-					if (this.password.length === this.payPwdGrid.length) {
-						//长度达6位，自动验证
-						this.$emit('completed', this.password.join(''));
-						if (this.cancelType) {
-							this.toCancel()
-						}
+				} else {
+					this.$emit('completed', this.password.join(''));
+					if (this.cancelType) {
+						this.toCancel()
 					}
 				}
 			},
@@ -311,7 +306,6 @@
 					// 改变密码框
 					this.password = this.password.slice(0, this.password.length - 1);
 					this.payPwdGrid[passIndex - 1].text = "";
-					return;
 				}
 			},
 			// 清空密码
@@ -356,7 +350,7 @@
 
 	.wallet_class {
 		color: #777;
-		position: fixed;							
+		position: fixed;
 		z-index: 9;
 		height: 100vh;
 		width: 750rpx;
@@ -414,13 +408,10 @@
 				}
 
 				.forget_text {
-					width: 730rpx;
+					width: 750rpx;
 					font-size: 28rpx;
-					// color: #3D9BE4;
-					// text-align: right;
 					padding: 0 10rpx;
-					height: 10%;
-					margin-top: 5rpx;
+					margin-top: 10rpx;
 					display: flex;
 					justify-content: space-between;
 				}
@@ -578,12 +569,15 @@
 				background-repeat: no-repeat;
 				position: fixed;
 				z-index: 10;
-				width: 690rpx;
+				width: 750rpx;
 				height: 400rpx;
 				background-color: #fff;
 				top: 20vh;
-				left: 30rpx;
+				left: 0;
 				border-radius: 20rpx;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
 
 				.hader {
 					display: flex;
@@ -595,12 +589,12 @@
 				}
 
 				.contents {
-					/*width: 690rpx;*/
-					/*text-align: center;*/
+					width: 690rpx;
+					text-align: left;
 					font-size: 28rpx;
 					color: #333;
-					line-height: 50rpx;
-					padding:0 60rpx;
+					line-height: 60rpx;
+					margin-left: 28rpx;
 				}
 
 				.money {
@@ -617,7 +611,8 @@
 					height: 100rpx;
 					line-height: 100rpx;
 					display: flex;
-					justify-content: flex-start;
+					justify-content: center;
+					align-items: center;
 
 					.pay-pwd-grid {
 						margin: 0upx auto;
@@ -679,11 +674,10 @@
 				}
 
 				.forget_text {
-					width: 650rpx;
-					font-size: 28rpx;
-					padding: 0 10rpx;
-					height: 10%;
-					margin-top: 15rpx;
+					width: 750rpx;
+					font-size: 26rpx;
+					margin-top: 20rpx;
+					margin-right: 56rpx;
 					display: flex;
 					justify-content: space-between;
 				}

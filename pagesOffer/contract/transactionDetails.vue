@@ -19,9 +19,9 @@
 					<view v-if="isShowBox"
 						class="bg-white radius-s position-absolute color-black text-lg text-center gray-border-1"
 						style="width: 300rpx;right: 0;">
-						<view class="padding-tb margin-lr gray-border-bottom"
-							@click.stop="goToContractDetails(contractInfo.id)">合同</view>
-						<view class="padding-tb margin-lr" @click.stop="goToApplyArbitration(contractInfo.id)">申请仲裁
+						<view class="padding-tb margin-lr gray-border-bottom" @click.stop="goToContractDetails">合同
+						</view>
+						<view class="padding-tb margin-lr" @click.stop="goToApplyArbitration">申请仲裁
 						</view>
 					</view>
 				</view>
@@ -93,15 +93,14 @@
 						@click.stop="deleteTransaction(contractInfo.id)">删除
 					</view>
 					<view class="button_other gray-border-1 text-black" v-if="contractInfo.statusCode === '010'"
-						@click.stop="goToContractDetails(contractInfo.id)">查看合同
+						@click.stop="goToContractDetails">查看合同
 					</view>
 				</view>
 				<view v-else-if="contractInfo.status === 5" class="flex align-center justify-start">
 					<view class="button_other gray-border-1 text-black" @click.stop="checkDelayApply(contractInfo.id)">
 						延期原因
 					</view>
-					<view class="button_other gray-border-1 text-black"
-						@click.stop="goToContractDetails(contractInfo.id)">查看合同
+					<view class="button_other gray-border-1 text-black" @click.stop="goToContractDetails">查看合同
 					</view>
 				</view>
 				<view class="flex align-center justify-start" v-else>
@@ -109,48 +108,48 @@
 						v-if="contractInfo.statusCode === '010' || contractInfo.statusCode === '100' || contractInfo.statusCode ==='101' || contractInfo.statusCode ==='001' || contractInfo.statusCode ==='110'
                               || contractInfo.statusCode ==='201' || contractInfo.statusCode ==='210' || contractInfo.statusCode ==='212'
                               || contractInfo.statusCode ==='301' || contractInfo.statusCode ==='321' || contractInfo.statusCode ==='401' || contractInfo.statusCode ==='411' "
-						@click.stop="cancelTransaction(contractInfo.id,contractInfo.statusCode,'two','two','two')">
+						@click.stop="cancelTransaction">
 						取消
 					</view>
 
 					<view class="button_other gray-border-1 text-black" v-if="contractInfo.statusCode === '710'"
-						@click.stop="operateCancelContractApply(contractInfo.id,0)">撤消取消
+						@click.stop="operateCancelContractApply(0)">撤消取消
 					</view>
 
 					<view class="button_other gray-border-1 text-black" v-if="contractInfo.statusCode === '010'"
-						@click.stop="goToContractDetails(contractInfo.id)">查看合同
+						@click.stop="goToContractDetails">查看合同
 					</view>
 
 					<view class="button_other gray-border-1 text-black"
 						v-if="(contractInfo.statusCode === '100' && type === '0') || (contractInfo.statusCode ==='110' && type==='0')"
-						@click.stop="goToPaymentDeposit(contractInfo.id,contractInfo.firstPartDepositRequire,contractInfo.workInfoNo)">
+						@click.stop="goToPaymentDeposit(contractInfo.firstPartDepositRequire)">
 						交保证金
 					</view>
 
 					<view class="button_other gray-border-1 text-black"
 						v-if="(contractInfo.statusCode === '100' && type === '1') || (contractInfo.statusCode === '101' && type === '1')"
-						@click.stop="goToPaymentDeposit(contractInfo.id,contractInfo.secondPartDepositRequire,contractInfo.workInfoNo)">
+						@click.stop="goToPaymentDeposit(contractInfo.secondPartDepositRequire)">
 						交保证金
 					</view>
 
 					<view class="button_other gray-border-1 text-black"
 						v-if="(contractInfo.statusCode === '101' && type === '0') || (contractInfo.statusCode === '110' && type === '1')"
-						@click.stop="doPush(contractInfo.id,1)">催交保证金
+						@click.stop="doPush(1)">催交保证金
 					</view>
 
 					<!--                        样品是否合格-->
 					<view v-if="type === '0'" class="text-black">
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '221'"
-							@click.stop="doPush(contractInfo.id,2)">催收样品
+							@click.stop="doPush(2)">催收样品
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'"
-							@click.stop="doPush(contractInfo.id,3)">催收材料
+							@click.stop="doPush(3)">催收材料
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '212'"
-							@click.stop="unqualified(contractInfo.id,false,0)">不合格
+							@click.stop="unqualified(false,0)">不合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '212'"
-							@click.stop="unqualified(contractInfo.id,true,0)">合格
+							@click.stop="unqualified(true,0)">合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '201'"
 							@click.stop="deliverGoods(contractInfo.id,0)">样品发货
@@ -163,48 +162,48 @@
 						</view>
 						<view class="button_other gray-border-1"
 							v-if="contractInfo.statusCode === '410' || contractInfo.statusCode === '411'"
-							@click.stop="doPush(contractInfo.id,8)">催成品
+							@click.stop="doPush(8)">催成品
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '412'"
-							@click.stop="unqualified(contractInfo.id,false,1)">不合格
+							@click.stop="unqualified(false,1)">不合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '412'"
-							@click.stop="unqualified(contractInfo.id,true,1)">合格
+							@click.stop="unqualified(true,1)">合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '501'"
-							@click.stop="openUploadPayVoucher(contractInfo.id,1)">支付凭证
+							@click.stop="openUploadPayVoucher(1)">支付凭证
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '510'"
-							@click.stop="doPush(contractInfo.id,5)">催收款
+							@click.stop="doPush(5)">催收款
 						</view>
 						<view class="button_other gray-border-1"
 							v-if="contractInfo.statusCode === '600' || contractInfo.statusCode === '601'"
-							@click.stop="goToEvaluate(contractInfo.id,contractInfo.firstPartUserId)">
+							@click.stop="goToEvaluate">
 							评价
 						</view>
 					</view>
 					<view v-if="type === '1'" clas="text-black">
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '201'"
-							@click.stop="doPush(contractInfo.id,7)">催发样品
+							@click.stop="doPush(7)">催发样品
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '210'"
 							@click.stop="deliverGoods(contractInfo.id,0)">样品发货
 						</view>
 
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '221'"
-							@click.stop="unqualified(contractInfo.id,false,0)">不合格
+							@click.stop="unqualified(false,0)">不合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '221'"
-							@click.stop="unqualified(contractInfo.id,true,0)">合格
+							@click.stop="unqualified(true,0)">合格
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '212'"
-							@click.stop="doPush(contractInfo.id,2)">催收样品
+							@click.stop="doPush(2)">催收样品
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '301'"
-							@click.stop="doPush(contractInfo.id,9)">催发材料
+							@click.stop="doPush(9)">催发材料
 						</view>
-						<!--                    <view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'" @click.stop="unqualified(contractInfo.id,false,2)">不合格</view>-->
-						<!--                    <view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'" @click.stop="unqualified(contractInfo.id,true,2)">合格</view>-->
+						<!--                    <view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'" @click.stop="unqualified(false,2)">不合格</view>-->
+						<!--                    <view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'" @click.stop="unqualified(true,2)">合格</view>-->
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '321'"
 							@click.stop="confirmReceiveMaterial(contractInfo.id)">收到材料
 						</view>
@@ -218,17 +217,17 @@
 							@click.stop="deliverGoods(contractInfo.id,1)">成品发货
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '412'"
-							@click.stop="doPush(contractInfo.id,4)">催收成品
+							@click.stop="doPush(4)">催收成品
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '501'"
-							@click.stop="doPush(contractInfo.id,5)">催付款
+							@click.stop="doPush(5)">催付款
 						</view>
 						<view class="button_other gray-border-1" v-if="contractInfo.statusCode === '510'"
-							@click.stop="openUploadPayVoucher(contractInfo.id,2)">收款凭证
+							@click.stop="openUploadPayVoucher(2)">收款凭证
 						</view>
 						<view class="button_other gray-border-1"
 							v-if="contractInfo.statusCode === '600' || contractInfo.statusCode === '610'"
-							@click.stop="goToEvaluate(contractInfo.id,contractInfo.secondPartUserId)">
+							@click.stop="goToEvaluate">
 							评价
 						</view>
 					</view>
@@ -239,10 +238,10 @@
 						申请延期
 					</view>
 					<view class="button_other gray-border-1 text-black" v-if="contractInfo.statusCode === '701'"
-						@click.stop="operateCancelContractApply(contractInfo.id,2)">不同意
+						@click.stop="operateCancelContractApply(2)">不同意
 					</view>
 					<view class="button_other gray-border-1 text-black" v-if="contractInfo.statusCode === '701'"
-						@click.stop="operateCancelContractApply(contractInfo.id,1)">同意
+						@click.stop="operateCancelContractApply(1)">同意
 					</view>
 				</view>
 
@@ -256,13 +255,9 @@
 			</view>
 		</view>
 
-		<jp-pwd ref="jpPwds" @completed="completed" @inputPwd="inputPwd" :money="pwd.money" :payType="pwd.payType"
-			:keyType="pwd.keyType" @forget="forgetPass" :pawType="pwd.pawType" :tite="pwd.title"
-			:contents="pwd.contents" :cancelType="pwd.cancelType" :keep="pwd.keep" :msg="pwd.msg" :places="pwd.places"
-			contentsColor="#555" :keyImg="keyImg" :topImg="topImg" :isPwy="pwd.isPwy" titeColor="#fb5318"></jp-pwd>
-
-		<passkeyborad :show="keyboardShow" :payType="payType" :money="payMoney" @password="password" :isIphoneX="false"
-			@close="close"></passkeyborad>
+		<jp-pwd ref="jpPwds" @completed="completed" @forget="forgetPass" :payType="pwd.payType" style="z-index: 99;"
+			:keyType="pwd.keyType" :pawType="pwd.pawType" :tite="pwd.title" :contents="pwd.contents" :cancel-type="true"
+			:keep="pwd.keep" :places="pwd.places" contentsColor="#555" :isPwy="pwd.isPwy" titeColor="#fb5318"></jp-pwd>
 
 
 		<!--       发货弹出框-->
@@ -350,7 +345,6 @@
 
 <script>
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
-	import passkeyborad from '@/components/yzc-paykeyboard/yzc-paykeyboard.vue';
 	import jpPwd from '@/components/jp-pwd/jp-pwd.vue';
 	import uniSteps from '../components/uni-steps.vue'
 	import uniCollapse from '../components/uni-collapse.vue'
@@ -385,7 +379,8 @@
 
 	import {
 		publicKey,
-		imgUrl,active
+		imgUrl,
+		active
 	} from '@/utils/config';
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
@@ -403,7 +398,6 @@
 			uniCollapseItem,
 			uniPopup,
 			jpPwd,
-			passkeyborad,
 			uploadImgBar,
 			uniPopupDialogTextArea,
 			// #ifndef H5
@@ -427,30 +421,22 @@
 				releaseWorkBannerImg: null,
 
 				options: [],
-				keyImg: '',
-				topImg: '',
 				pwd: {
-					money: 100, //支付金额
 					payType: 'two', //支付样式  one two
-					keyType: 'one', //键盘样式  one two
+					keyType: 'two', //键盘样式  one two
 					pawType: 'one', //输入框样式  one two
 					title: '系统提示', //标题
-					contents: '请输入支付密码，以确认是本人操作！', //提示
-					cancelType: false, //是否输入完密码后消失
+					contents: '请输入支付密码', //提示
 					keep: true, //点击遮挡是否关闭
-					msg: '', // 密码错误提示语
 					places: 6,
 					isPwy: true
 				},
 				type: null, // //type=0 ---- 甲方，发活方；type=1 ---乙方，接活方
 				statusCode: null,
-
+				
+				payMoney: 0, //需要支付的保证金
 				totalMoney: 0, //总保证金
 				freezeMoney: 0, //被冻结的保证金
-				payType: 5, //保证金
-				keyboardShow: false,
-				payPassword: null,
-				payMoney: 0, //需要支付的保证金
 
 				waybill: '', //运单号
 				carrier: '',
@@ -529,9 +515,9 @@
 						delta: 1 // 返回的页面数
 					});
 				} else if (e.action === 'btn1') {
-					this.goToContractDetails(this.contractInfo.id);
+					this.goToContractDetails();
 				} else if (e.action === 'btn2') {
-					this.goToApplyArbitration(this.contractInfo.id);
+					this.goToApplyArbitration();
 				}
 			},
 			reSize(e) {
@@ -542,7 +528,7 @@
 				//获取默认图片
 				let defaultResource = uni.getStorageSync("defaultResource");
 				this.releaseWorkBannerImg = defaultResource[0].resourceUrl[0];
-				
+
 				this.getContractRecord();
 			},
 			toLogin() {
@@ -556,13 +542,9 @@
 				})
 			},
 			//跳转到评论页面
-			goToEvaluate(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
+			goToEvaluate() {
 				uni.navigateTo({
-					url: './evaluate?contractId=' + id + '&type=' + this.type
+					url: './evaluate?contractId=' + this.contractInfo.id + '&type=' + this.type
 				})
 			},
 			//上传凭证
@@ -602,8 +584,7 @@
 				});
 			},
 			//打开凭证上传
-			openUploadPayVoucher(id, voucherType) {
-				this.contractInfo.id = id
+			openUploadPayVoucher(voucherType) {
 				this.voucherType = voucherType
 				if (voucherType === 1) { //付款
 					this.voucherTitle = '付款凭证'
@@ -614,12 +595,9 @@
 			},
 			//查看延期申请
 			checkDelayApply(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
 				uni.navigateTo({
-					url: '../../pagesOffer/contract/applyPostpone?contractId=' + id + '&type=' + this.type
+					url: '/pagesOffer/contract/applyPostpone?contractId=' + this.contractInfo.id + '&type=' + this
+						.type
 				})
 			},
 			//完成成品
@@ -654,8 +632,7 @@
 			},
 
 			//打开不合格原因输入弹出框
-			unqualified(id, qualified, qualifiedType) {
-				this.contractInfo.id = id
+			unqualified(qualified, qualifiedType) {
 				this.qualified = qualified
 				this.qualifiedType = qualifiedType
 				let contentModal = ''
@@ -807,125 +784,31 @@
 					}
 				}
 			},
-
-			password(e) {
-				this.payPassword = e
-				if (this.payPassword) {
-					this.submitPay()
-				} else {
-					uni.showToast({
-						title: '请输入支付密码',
-						icon: "none",
-						duration: 1500
-					})
-				}
-			},
-			submitPay() {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
-				let paramsData = {
-					contractId: this.contractInfo.id,
-					amount: this.payMoney * 1000,
-					deviceType: 2,
-					password: jse.encrypt(this.payPassword)
-				}
-				let self = this;
-				payDeposit(paramsData).then(res => {
-					if (res.retCode === 0) {
-						uni.showToast({
-							title: "交保证金成功！",
-							icon: "none",
-							duration: 2000
-						})
-						setTimeout(() => {
-							self.getContractRecord()
-						}, 2000)
-					}
-				});
-			},
-
-			close() {
-				this.keyboardShow = false
-			},
-
 			completed(e) {
-				let reasonType = 1
-				if (this.type === '1') {
-					reasonType = 2
-				} else if (this.type === '0') {
-					reasonType = 1
-				}
-				let paramsData = {
-					deviceType: 2,
-					password: jse.encrypt(e),
-				}
-				let self = this;
-				verUserPassword(paramsData).then(res => {
-					if (res.retCode === 0) {
-						if (this.statusCode === '010') {
-							let paramsDataCancel = {
-								contractId: self.contractInfo.id,
-							}
-							if (this.type === '1') {
-								paramsDataCancel['responsibleUserUserType'] = 2
-							} else if (this.type === '0') {
-								paramsDataCancel['responsibleUserUserType'] = 1
-							}
-
-							cancelContractApply(paramsDataCancel).then(res0 => {
-								if (res0.retCode === 0) {
-									uni.showToast({
-										title: '取消成功！',
-										icon: "none",
-										duration: 2000
-									})
-									self.$refs.jpPwds.backs()
-									self.$refs.jpPwds.toCancel()
-									setTimeout(() => {
-										self.getContractRecord()
-									}, 2000);
-								}
-							});
-						} else if (self.statusCode === '001' || self.statusCode === '100' || self.statusCode ===
-							'110' || self.statusCode === '101') { //取消交易，不需要赔偿
-							uni.navigateTo({
-								url: '/pagesOffer/contract/cancelReason?contractId=' + self.contractInfo
-									.id + '&processType=deposit&reasonType=' + reasonType
-							})
-						} else if (self.statusCode === '201' || self.statusCode === '210' || self.statusCode ===
-							'212' || self.statusCode === '221') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '/pagesOffer/contract/cancelReason?contractId=' + self.contractInfo
-									.id + '&processType=sample&reasonType=' + reasonType + '&isShowMoney=1'
-							})
-						} else if (self.statusCode === '301' || self.statusCode === '321') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '/pagesOffer/contract/cancelReason?contractId=' + self.contractInfo
-									.id + '&processType=metal&reasonType=' + reasonType + '&isShowMoney=1'
-							})
-						} else if (self.statusCode === '401' || self.statusCode === '411') { //取消交易，需要赔偿金
-							uni.navigateTo({
-								url: '/pagesOffer/contract/cancelReason?contractId=' + self.contractInfo
-									.id + '&processType=product&reasonType=' + reasonType +
-									'&isShowMoney=1'
-							})
-						}
-						self.$refs.jpPwds.backs()
-						self.$refs.jpPwds.toCancel()
+				if (e) {
+					let paramsData = {
+						contractId: this.contractInfo.id,
+						amount: this.payMoney * 1000,
+						deviceType: 2,
+						password: jse.encrypt(e)
 					}
-				});
-			},
-			inputPwd() {
-				this.pwd.msg = ''
+					let self = this;
+					payDeposit(paramsData).then(res => {
+						if (res.retCode === 0) {
+							uni.showToast({
+								title: "交保证金成功！",
+								icon: "none",
+								duration: 2000
+							})
+							setTimeout(() => {
+								self.getContractRecord()
+							}, 2000)
+						}
+					});
+				}
 			},
 			//删除交易
 			deleteTransaction(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
 				let paramsData = {
 					contractId: id
 				}
@@ -950,18 +833,79 @@
 			},
 
 			//取消交易
-			cancelTransaction(id, statusCode, payType, keyType, pawType, img1, img2) {
-				this.contractInfo.id = id
-				this.statusCode = statusCode
-				this.pwd.isPwy = true
-				this.topImg = img1 || ''
-				this.keyImg = img2 || ''
-				// this.pwd.payType = payType
-				this.pwd.keyType = keyType
-				this.pwd.pawType = pawType
-				this.pwd.places = 6
-				this.$refs.jpPwds.toOpen()
+			cancelTransaction() {
+				let reasonType = 1
+				if (this.type === '1') {
+					reasonType = 2
+				}
 
+				let self = this;
+
+				uni.showModal({
+					title: "系统提示",
+					content: '是否确定取消合同吗？',
+					cancelText: '取消',
+					confirmText: '确定',
+					confirmColor: '#fb5318',
+					success: function(res1) {
+						if (res1.confirm) {
+							if (self.contractInfo.statusCode === '010') {
+								let paramsDataCancel = {
+									contractId: self.contractInfo.id,
+								}
+								if (self.type === '1') {
+									paramsDataCancel['responsibleUserUserType'] = 2
+								} else if (self.type === '0') {
+									paramsDataCancel['responsibleUserUserType'] = 1
+								}
+
+								cancelContractApply(paramsDataCancel).then(res0 => {
+									if (res0.retCode === 0) {
+										uni.showToast({
+											title: '取消成功！',
+											icon: "none",
+											duration: 2000
+										})
+										setTimeout(() => {
+											self.getContractRecord()
+										}, 2000);
+									}
+								});
+							} else if (self.contractInfo.statusCode === '001' || self.contractInfo
+								.statusCode === '100' || self.contractInfo.statusCode ===
+								'110' || self.contractInfo.statusCode === '101') { //取消交易，不需要赔偿
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self
+										.contractInfo.id + '&processType=deposit&reasonType=' +
+										reasonType
+								})
+							} else if (self.contractInfo.statusCode === '201' || self.contractInfo
+								.statusCode === '210' || self
+								.contractInfo.statusCode === '212' || self.contractInfo.statusCode === '221'
+							) { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self
+										.contractInfo.id + '&processType=sample&reasonType=' +
+										reasonType + '&isShowMoney=1'
+								})
+							} else if (self.contractInfo.statusCode === '301' || self.contractInfo
+								.statusCode === '321') { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self
+										.contractInfo.id + '&processType=metal&reasonType=' +
+										reasonType + '&isShowMoney=1'
+								})
+							} else if (self.contractInfo.statusCode === '401' || self.contractInfo
+								.statusCode === '411') { //取消交易，需要赔偿金
+								uni.navigateTo({
+									url: '/pagesOffer/contract/cancelReason?contractId=' + self
+										.contractInfo.id + '&processType=product&reasonType=' +
+										reasonType + '&isShowMoney=1'
+								})
+							}
+						}
+					}
+				})
 			},
 			disagreeReasonConfirmed(action, val) {
 				let paramsData = {
@@ -985,20 +929,14 @@
 				});
 			},
 			//撤销取消
-			operateCancelContractApply(id, operateType) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
-
+			operateCancelContractApply(operateType) {
 				if (operateType === 2) {
-					this.contractInfo.id = id;
 					this.$refs.reason.open();
 					return;
 				}
 
 				let paramsData = {
-					contractId: id,
+					contractId: this.contractInfo.id,
 					operateType: operateType
 				}
 				let self = this
@@ -1041,7 +979,7 @@
 				this.$refs.popupGoods.open()
 			},
 			//催缴、催收
-			async doPush(contractId, urgeType) {
+			doPush(urgeType) {
 				let message = ''
 				if (urgeType === 1) {
 					message = '请确认是否催缴保证金？'
@@ -1062,6 +1000,7 @@
 				} else if (urgeType === 9) {
 					message = '请确认是否催发材料？'
 				}
+				let self = this;
 				uni.showModal({
 					title: "系统提示",
 					content: message,
@@ -1069,10 +1008,10 @@
 					cancelText: '取消',
 					confirmText: '确定',
 					confirmColor: '#fb5318',
-					success: async function(res1) {
+					success: function(res1) {
 						if (res1.confirm) {
 							let paramsData = {
-								contractId: contractId,
+								contractId: self.contractInfo.id,
 								urgeType: urgeType
 							}
 							doUrgeAnything(paramsData).then(res => {
@@ -1089,35 +1028,37 @@
 				})
 			},
 			//跳转到交保证金页面
-			goToPaymentDeposit(id, money, workInfoNo) {
-				// #ifndef APP-PLUS
+			goToPaymentDeposit(money) {
+				// #ifdef H5 || MP-WEIXIN
 				this.loadUserData({
-					id: id,
 					money: money,
-					workInfoNo: workInfoNo,
 				});
 				// #endif
 				// #ifdef APP-PLUS
-				uni.showModal({
-					title: "系统提示",
-					content: '请使用其他客户端充值',
-					showCancel: false,
-					confirmText: '我知道了',
-					confirmColor: '#fb5318',
-					success: function(res1) {}
-				})
+				let platform = uni.getStorageSync("platform");
+				if (platform === "ios") {
+					uni.showModal({
+						title: "系统提示",
+						content: '请使用其他客户端充值',
+						showCancel: false,
+						confirmText: '我知道了',
+						confirmColor: '#fb5318',
+					})
+				} else {
+					this.loadUserData({
+						money: money,
+					});
+				}
 				// #endif
 			},
 			submitDeposit(param) {
 				//如果保证金总额减去冻结的保证金大于应支付的保证金金额，则直接输入支付密码扣除
 				if ((this.totalMoney - this.freezeMoney) > (param.money / 1000)) {
-					this.contractInfo.id = param.id
-					this.payMoney = (param.money / 1000)
-					this.payPassword = ''
-					this.keyboardShow = true
+					this.payMoney = param.money / 1000;
+					this.$refs.jpPwds.toOpen();
 				} else { //小于则跳转到缴纳保证金页面
 					uni.navigateTo({
-						url: '../../pagesPersonal/pay/paymentDeposit?contractId=' + param.id
+						url: '/pagesPersonal/pay/paymentDeposit?contractId=' + this.contractInfo.id
 					})
 				}
 			},
@@ -1137,28 +1078,20 @@
 			},
 
 			//跳转到合同详情
-			goToContractDetails(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
+			goToContractDetails() {
 				uni.navigateTo({
-					url: './contractDetails?id=' + id + '&type=' + this.type
+					url: './contractDetails?id=' + this.contractInfo.id + '&type=' + this.type
 				})
 			},
 			//打电话
 			callPhone(phone) {
 				uni.makePhoneCall({
 					phoneNumber: phone
-				}).catch(e=>{});
+				}).catch(e => {});
 			},
 
 			//确认收到材料
 			confirmReceiveMaterial(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
 				let self = this;
 				uni.showModal({
 					title: "系统提示",
@@ -1190,10 +1123,6 @@
 			},
 			//确认验收成品
 			acceptProduct(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
 				let self = this
 				uni.showModal({
 					title: "系统提示",
@@ -1224,13 +1153,9 @@
 				})
 			},
 
-			goToApplyArbitration(id) {
-				if (!this.token) {
-					this.toLogin();
-					return;
-				}
+			goToApplyArbitration() {
 				uni.navigateTo({
-					url: './applyArbitration?id=' + id + '&type=' + this.type
+					url: './applyArbitration?id=' + this.contractInfo.id + '&type=' + this.type
 				})
 			},
 
@@ -1240,10 +1165,7 @@
 					id: this.contractInfo.id
 				}
 				let self = this;
-				console.log(2);
 				getContractRecord(paramsData).then(res => {
-					console.log(3);
-					console.log(res);
 					if (res.retCode === 0) {
 						self.options = []
 
@@ -1322,7 +1244,7 @@
 							},
 						]
 						for (let i in a) {
-							
+
 							for (let j in a[i]) {
 								b = a[i][j]
 								if (b.length > 0) {
@@ -1361,13 +1283,13 @@
 				})
 			},
 			forgetPass() {
+				this.$refs.jpPwds.toCancel();
 				uni.navigateTo({
-					url: '../../pagesPersonal/pay/setPayPassword',
+					url: '/pagesPersonal/pay/setPayPassword',
 				})
 			},
 			otherFun(object) { //选择地址后的数据收集
 				if (!!object) {
-					console.log(object);
 					this.getContractRecord();
 				}
 			},

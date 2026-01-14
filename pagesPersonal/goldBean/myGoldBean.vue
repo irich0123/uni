@@ -11,7 +11,7 @@
 			</view>
 		</view>
 
-		<view class="flex align-center justify-between bg-gray-1">
+		<!-- 		<view class="flex align-center justify-between bg-gray-1">
 			<view class="flex-sub">
 				<uni-list>
 					<uni-list-item title="充金豆" @click="goToBeanGoods" :thumb="imgUrl+'/personal/beans.png'"
@@ -25,6 +25,26 @@
 					<uni-list-item title="换礼品" @click="gotoGiftStore" :thumb="imgUrl+'/ic_gift.png'" v-if="false"
 						thumb-size="sm" :show-arrow="false" />
 				</uni-list>
+			</view>
+		</view> -->
+
+		<view class="flex align-center justify-between bg-gray-1 flex-wrap">
+			<view @click="goToBeanGoods" class="flex align-center justify-center bg-white margin-top-xs"
+				:style="'height:88rpx;width:'+halfScreen+'px'">
+				<image :src="imgUrl+'/personal/beans.png'" style="width:48rpx;height:48rpx;margin-right: 12rpx;">
+				</image>
+				<view>充金豆</view>
+			</view>
+			<view @click="toInput" class="flex align-center justify-center bg-white margin-top-xs"
+				:style="'height:88rpx;width:'+halfScreen+'px'">
+				<image :src="imgUrl+'/personal/exchange.png'" style="width:48rpx;height:48rpx;margin-right: 12rpx;">
+				</image>
+				<view>金豆兑换码</view>
+			</view>
+			<view @click="gotoGiftStore" class="flex align-center justify-center bg-white margin-top-xs"
+				:style="'height:88rpx;width:'+halfScreen+'px'" v-if="false">
+				<image :src="imgUrl+'ic_gift.png'" style="width:48rpx;height:48rpx;margin-right: 12rpx;"></image>
+				<view>换礼品</view>
 			</view>
 		</view>
 
@@ -83,7 +103,7 @@
 	import {
 		active
 	} from '@/utils/config';
-	
+
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	import uniPopupDialogTextArea from '@/components/uni-popup/uni-popup-dialog-text-area.vue'
 	import UniList from "@/components/uni-list/uni-list";
@@ -112,7 +132,7 @@
 
 				token: null,
 				userData: {},
-				
+
 				list: [],
 				triggered: false,
 				page: 1,
@@ -133,6 +153,7 @@
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
+				halfScreen: 0,
 			}
 		},
 		watch: {
@@ -140,10 +161,10 @@
 				handler(newVal, oldVal) {
 					//#ifndef H5
 					this.contentTop = newVal + 40;
-					this.listHeight = uni.getWindowInfo().safeArea.height - 145 - 92 - 40;
+					this.listHeight = uni.getWindowInfo().safeArea.height - 145 - 15 - 40;
 					//#endif
 					// #ifdef H5
-					this.listHeight = uni.getWindowInfo().safeArea.height - 145 - 92 - (active === 'prod' ? 0 : 40);
+					this.listHeight = uni.getWindowInfo().safeArea.height - 145 - 15 - (active === 'prod' ? 0 : 40);
 					// #endif
 				},
 				immediate: true
@@ -158,6 +179,7 @@
 			}
 		},
 		onLoad() {
+			this.halfScreen = uni.getWindowInfo().screenWidth / 2
 			this.token = uni.getStorageSync('token');
 			this.userData = uni.getStorageSync("user");
 			this.initData();
@@ -258,7 +280,7 @@
 				let paramsData = {
 					page: this.page,
 					size: this.size,
-					type: 2  //    余额(1),金豆(2),信誉度(3),保证金(4);
+					type: 2 //    余额(1),金豆(2),信誉度(3),保证金(4);
 				}
 				let self = this;
 				getAccountRecordList(paramsData).then(res => {

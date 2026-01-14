@@ -1,11 +1,5 @@
 <template>
-	<view class="container no-scroll					//#ifndef H5
-					this.contentTop = newVal + 40;
-					this.listHeight = uni.getWindowInfo().safeArea.height - newVal;
-					//#endif
-					// #ifdef H5
-					this.listHeight = uni.getWindowInfo().safeArea.height - (active === 'prod' ? 0 : 40);
-					// #endif">
+	<view class="container no-scroll">
 		<!-- #ifndef  H5-->
 		<my-nav-bar title="选择收货地址" @action="navAction" @reSize="reSize" class="my-nav-bar" />
 		<!-- #endif -->

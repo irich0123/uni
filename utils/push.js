@@ -2,12 +2,8 @@ import {
 	getNotifyConfigByCode
 } from "@/api/mall";
 
-const jpushModule = uni.requireNativePlugin("JG-JPush");
-
-
 export const initPush = () => {
-	console.log("jpushModule=", jpushModule);
-	console.log("initPush start");
+	const jpushModule = uni.requireNativePlugin("JG-JPush");
 
 	jpushModule.initJPushService();
 	jpushModule.setLoggerEnable(true);
@@ -18,10 +14,22 @@ export const initPush = () => {
 		uni.$emit('connectStatusChange', connectEnable);
 	});
 
+	let deviceInfo = uni.getStorageSync("deviceInfo");
+	console.log("deviceInfo=", deviceInfo);
+	if (!deviceInfo) {
+		jpushModule.getRegistrationID(result => {
+			console.log("result==", result);
+			if (!!result.registerID) {
+				let registerID = result.registerID
+				uni.setStorageSync("deviceInfo", "RID=" + registerID);
+			}
+		});
+	}
+
 	// 监听通知事件
 	jpushModule.addNotificationListener(result => {
 		console.log("result==", result);
-		let notificationEventType = result.notificationEventType
+		let notificationEventType = result.notificationEventType;
 		let messageID = result.messageID;
 		let content = result.content;
 		let extras = result.extras;
@@ -67,7 +75,16 @@ export const initPush = () => {
 			if (platform === 'android') {
 				plus.runtime.setBadgeNumber(0);
 			} else if (platform === 'ios') {
-				clearIosBadge();
+				var UIApplication = plus.ios.import("UIApplication");
+				var app = UIApplication.sharedApplication();
+				//获取应用图标的数量
+				var oldNum = app.applicationIconBadgeNumber();
+				if (oldNum > 0) {
+					var newNum = oldNum - 1;
+					//设置应用图标的数量
+					plus.runtime.setBadgeNumber(newNum);
+					jpushModule.setBadge(newNum);
+				}
 			}
 
 			//跳转相应的页面
@@ -90,22 +107,9 @@ export const initPush = () => {
 		})
 	});
 
-	console.log("initPush done");
 }
 
 
-const clearIosBadge = () => {
-	var UIApplication = plus.ios.import("UIApplication");
-	var app = UIApplication.sharedApplication();
-	//获取应用图标的数量
-	var oldNum = app.applicationIconBadgeNumber();
-	if (oldNum != 0) {
-		var newNum = oldNum - 1;
-		//设置应用图标的数量
-		plus.runtime.setBadgeNumber(newNum);
-		jpushModule.setBadge(newNum);
-	}
-}
 
 const mallNotifyHandle = (code, relationId) => {
 	let self = this;

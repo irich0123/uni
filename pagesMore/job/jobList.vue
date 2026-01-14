@@ -183,7 +183,6 @@
 			toDetail(task) {
 				if (task.type === 1) { //每日任务
 					if (task.toUrl.indexOf("http") > -1) {
-						//todo 小程序和公众号分享 及APP分享功能
 						uni.navigateTo({
 							url: '/pages/common/webview?url=' + encodeURIComponent(task.toUrl + "?t=" + new Date().getTime()),
 						})

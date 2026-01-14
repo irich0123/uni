@@ -396,10 +396,10 @@
 
 			// #ifdef APP-PLUS
 			let notifyConfirmTime = uni.getStorageSync('notifyConfirmTime');
-			if(!notifyConfirmTime){
+			if (!notifyConfirmTime) {
 				notifyConfirmTime = new Date().getTime();
 			}
-			if ((new Date().getTime() - notifyConfirmTime) > 3 * 60 * 60 *1000) {
+			if ((new Date().getTime() - notifyConfirmTime) > 3 * 60 * 60 * 1000) {
 				uni.setStorageSync('notifyConfirmTime', new Date().getTime());
 				this.toCheckNotify();
 			}
@@ -742,23 +742,15 @@
 				adminLogin(param).then(res => {
 					if (res.retCode === 0) {
 						uni.setStorageSync("adminToken", res.data.adminToken);
-						uni.navigateTo({
-							url: '/pagesAdmin/admin/index',
-						})
+						setTimeout(() => {
+							uni.navigateTo({
+								url: '/pagesAdmin/admin/index',
+							})
+						},500)
 					}
 				});
 			}
 		},
-		// 监听用户下拉动作，一般用于下拉刷新
-		onPullDownRefresh() {
-			if (!!this.token) {
-				this.loadUserData()
-			}
-			setTimeout(() => {
-				uni.stopPullDownRefresh();
-			}, 500)
-		},
-
 		/**
 		 * 用户点击右上角分享 ---小程序
 		 */

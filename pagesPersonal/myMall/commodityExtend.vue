@@ -70,10 +70,10 @@
 
 		<view class="bg-white" style="width: 100%;position: fixed;left: 0;bottom: 0;z-index: 19;">
 			<button class="bg-theme text-xl color-white radius-0" :disabled="payTypeIndex==null"
-				@click="pay">立即支付</button>
+				@click="toPay">立即支付</button>
 		</view>
 
-		<passkeyboard :show="showPopup" :payType="payType" :money="totalMoney" @password="password" :isIphoneX="false"
+		<passkeyboard :show="showPopup" :payType="payType" :money="totalMoney" @password="password" :isIphoneX="false" style="z-index: 99;"
 			@close="close"></passkeyboard>
 	</view>
 </template>
@@ -82,9 +82,10 @@
 	import {
 		payWayConfig,
 		publicKey,
-		imgUrl,active
+		imgUrl,
+		active
 	} from '@/utils/config.js'
-	import passkeyboard from '@/components/yzc-paykeyboard/yzc-paykeyboard.vue';
+	import passkeyboard from '@/pagesPersonal/components/yzc-paykeyboard/yzc-paykeyboard.vue';
 	import {
 		formatTime,
 		formatTimeNoHour,
@@ -95,19 +96,26 @@
 		getCommodityExtendShowTimeCost,
 	} from "@/api/mall";
 	import {
-		getUserAccountInfoByUserId,
-	} from "@/api/user";
-	import {
 		getPayOrderStatus,
 		payAny
 	} from "@/api/finance";
 	import UniIcons from "@/components/uni-icons/uni-icons";
 	import CommodityListCell from "@/utils/yjg-list-cell/commodity-list-cell";
+	// #ifdef H5
+	import {
+		h5OnBridgeReady,
+	} from "@/utils/pay";
+	// #endif
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
+	import {
+		appAliPay,
+		appWeixinPay,
+		mpWeixinMiniPay,
+	} from "@/utils/pay";
 	// #endif
-	import UniForms from "../../components/uni-forms/uni-forms";
-	import uniFormsItem from "../../components/uni-forms-item/uni-forms-item";
+	import UniForms from "@/components/uni-forms/uni-forms";
+	import uniFormsItem from "@/components/uni-forms-item/uni-forms-item";
 
 	const jsEncrypt = require('@/utils/jsencrypt')
 	let jse = new jsEncrypt.JSEncrypt();
@@ -125,7 +133,6 @@
 		},
 		data() {
 			return {
-				id: null,
 				token: null,
 				userData: {},
 				openId: null,
@@ -139,12 +146,9 @@
 
 				days: 10,
 				totalMoney: null,
-				totalBean: null,
 				payType: null,
 				showPopup: false,
 				payPassword: null,
-				userTotalBeans: null,
-				userBalanceMoney: null,
 
 				payTypeIndex: null,
 				imgSelected: imgUrl + '/mall/select.png',
@@ -156,7 +160,6 @@
 				startTime: 0,
 				payData: {},
 
-				imgUrl: imgUrl,
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
@@ -185,9 +188,9 @@
 			this.userData = uni.getStorageSync("user");
 			this.openId = uni.getStorageSync('openId')
 
-			// this.payWayConfig.find(v => {
-			// 	return v.key === 'balance'
-			// }).active = true;
+			this.payWayConfig.forEach(v => {
+				v.active = false;
+			})
 
 			// #ifdef H5
 			this.payWayConfig.find(v => {
@@ -208,7 +211,7 @@
 			}).active = true;
 			// #endif
 
-			this.id = parseInt(options.id);
+			this.commodity.id = parseInt(options.id);
 
 			this.initData();
 		},
@@ -255,7 +258,7 @@
 			},
 
 			initData() {
-				this.getUserInfo();
+				this.getCommodityDetailsById();
 			},
 
 			generateTimeDuration() {
@@ -270,26 +273,10 @@
 				console.log("extendedDate", this.extendedDate);
 				this.exhibitionEndDate = formatTimeNoHour(new Date(oldEnd + 180 * day));
 			},
-			//获取个人资料信息
-			getUserInfo() {
-				let self = this;
-				getUserAccountInfoByUserId({
-					userId: this.userData.id
-				}).then(res => {
-					if (res.retCode === 0) {
-						if (res.data) {
-							self.userBalanceMoney = Number(res.data.balanceMoney / 1000);
-							self.userTotalBeans = res.data.beans;
-						}
-
-						self.getCommodityDetailsById();
-					}
-				});
-			},
 
 			getCommodityDetailsById() {
 				let paramsData = {
-					id: this.id,
+					id: this.commodity.id,
 				}
 				let self = this;
 				getCommodityById(paramsData).then(res => {
@@ -319,61 +306,18 @@
 			},
 
 			//立即支付提交
-			pay() {
-				if (this.payTypeIndex === null) {
-					uni.showToast({
-						title: '请选择支付方式',
-						icon: "none",
-						duration: 1500
-					})
-					console.log("请选择支付方式")
+			toPay() {
+				if (this.payWayList[this.payTypeIndex].payType === 3) {
+					this.showPopup = true;
 					return
 				}
-
-				//3---余额，4---金豆
-				if (this.payWayList[this.payTypeIndex].payType === 3) {
-					console.log("用户余额，", this.userBalanceMoney)
-					console.log("应支付，", this.totalMoney)
-					if (!this.userBalanceMoney || (this.userBalanceMoney < this.totalMoney)) {
-						uni.showToast({
-							title: '您的余额不足，请更换支付方式！',
-							icon: "none",
-							duration: 3000
-						})
-						return;
-					}
-					this.payPassword = ''
-					this.showPopup = true
-				} else if (this.payWayList[this.payTypeIndex].payType === 4) {
-					console.log("用户金豆，", this.userTotalBeans)
-					console.log("应支付，", this.totalBean)
-					if (!this.userTotalBeans || this.userTotalBeans < this.totalBean) {
-						uni.showToast({
-							title: '您的金豆不足，请更换支付方式！',
-							icon: "none",
-							duration: 3000
-						})
-					}
-					this.payPassword = ''
-					this.showPopup = true
-				} else {
-					if (!this.openId) {
-						uni.showToast({
-							title: '非微信平台环境，不能支付',
-							icon: "none",
-							duration: 3000
-						});
-						return;
-					}
-					this.submitPay()
-				}
+				this.submitPay()
 			},
 
 			submitPay() {
 				let paramsData = {
-					deviceType: 2,
 					payType: this.payWayList[this.payTypeIndex].payType,
-					productSaleId: this.id,
+					productSaleId: this.commodity.id,
 					targetType: 10,
 					openId: this.openId,
 				}
@@ -383,24 +327,49 @@
 					paramsData['extendedShowDays'] = this.day
 					paramsData['targetType'] = 9
 				}
-				if (this.payWayList[this.payTypeIndex].payType === 3 || this.payWayList[this.payTypeIndex].payType === 4) {
-					paramsData['password'] = jse.encrypt(this.payPassword);
-				}
-				if (this.payType === 4) {
-					paramsData['payAmount'] = this.totalBean;
-				} else {
-					paramsData['payAmount'] = this.totalMoney * 1000;
-				}
+				paramsData['payAmount'] = this.totalMoney * 1000;
 
+				if (this.payWayList[this.payTypeIndex].payType === 3) {
+					paramsData["deviceType"] = 2;
+					paramsData['password'] = jse.encrypt(this.payPassword);
+					payAny(paramsData).then(res => {
+						if (res.retCode === 0) {
+							self.paySuccess();
+						}
+					}).catch(err => {
+						uni.showToast({
+							title: err.message,
+							icon: "error",
+						})
+					});
+				} else {
+					// #ifdef H5 | MP-WEIXIN
+					this.h5AndMpHandle(paramsData);
+					// #endif
+
+					// #ifdef APP-PLUS
+					this.appPlusHandle(paramsData);
+					// #endif
+				}
+			},
+
+			onBridgeReady() {
+				let self = this;
+				h5OnBridgeReady(this.payData).then(() => {
+					self.handlePayResult();
+				})
+			},
+			h5AndMpHandle(paramsData) {
 				let self = this;
 				payAny(paramsData).then(res => {
 					if (res.retCode === 0) {
 						self.payData = res.data;
-						if (self.payWayList[self.payTypeIndex].payType === 8) {
+						if (self.payWayList[self.payTypeIndex].payType === 8) { //微信H5支付
 							// #ifdef H5
 							if (typeof WeixinJSBridge === "undefined") {
 								if (document.addEventListener) {
-									document.addEventListener('WeixinJSBridgeReady', self.onBridgeReady, false);
+									document.addEventListener('WeixinJSBridgeReady', self.onBridgeReady,
+										false);
 								} else if (document.attachEvent) {
 									document.attachEvent('WeixinJSBridgeReady', self.onBridgeReady);
 									document.attachEvent('onWeixinJSBridgeReady', self.onBridgeReady);
@@ -408,65 +377,51 @@
 							} else {
 								self.onBridgeReady();
 							}
-							//    #endif
-						} else if (self.payWayList[self.payTypeIndex].payType === 5) {
-							//  #ifdef MP-WEIXIN
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: String(res.data.timeStamp),
-								nonceStr: String(res.data.nonce_str),
-								package: String(res.data.package),
-								signType: 'MD5',
-								paySign: String(res.data.sign),
-								success: function(res1) {
-									console.log("success:", res1)
-									if (res1) {
-										self.handlePayResult();
-									}
-								},
-								fail: function(err) {
-									console.log("fail:", err)
-									uni.showToast({
-										title: '支付失败',
-										icon: "none",
-										duration: 2000
-									})
-								}
+							// #endif
+						} else if (self.payWayList[self.payTypeIndex].payType === 5) { //微信小程序支付
+							//    #ifdef MP-WEIXIN
+							mpWeixinMiniPay(self.payData).then(() => {
+								self.handlePayResult();
 							});
-							//    #endif
-						} else {
-							self.paySuccess();
+							// #endif
 						}
 					}
 				});
 			},
-
-			onBridgeReady() {
+			appPlusHandle(paramsData) {
 				let self = this;
-				WeixinJSBridge.invoke(
-					'getBrandWCPayRequest', {
-						"appId": this.payData.appid, //公众号名称，由商户传入
-						"timeStamp": this.payData.timeStamp, //时间戳，自1970年以来的秒数
-						"nonceStr": this.payData.nonce_str, //随机串
-						"package": this.payData.package,
-						"signType": 'MD5', //微信签名方式：
-						"paySign": this.payData.sign //微信签名
-					},
-					function(result) {
-						if (result.err_msg.indexOf("get_brand_wcpay_request:ok") > -1) {
-							// 使用以上方式判断前端返回,微信团队郑重提示：
-							//res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-							self.handlePayResult();
-						} else {
-							uni.showToast({
-								icon: 'error',
-								title: '支付失败！',
-								duration: 1500
-							});
-						}
-					});
-			},
+				payAny(paramsData).then(resPay => {
+					if (resPay.retCode === 0) {
+						self.payData = resPay.data;
+						uni.getProvider({
+							service: 'payment',
+							success: async (res) => {
+								if (self.payWayList[self.payTypeIndex].payType === 1 &&
+									res.providers.findIndex((channel) => {
+										return (channel.id === 'wxpay')
+									}) > -1) { //微信APP支付
+									appWeixinPay(self.payData).then(() => {
+										self.handlePayResult();
+									})
+								} else if (self.payWayList[self.payTypeIndex].payType === 2 &&
+									res.providers.findIndex((channel) => {
+										return (channel.id === 'alipay')
+									}) > -1) { //支付宝
 
+									let payDataString = self.payData;
+									let orderInfo = payDataString.split("&orderNo=")[0];
+
+									self.payData = {};
+									self.payData.orderNo = payDataString.split("&orderNo=")[1];
+									appAliPay(orderInfo).then(() => {
+										self.handlePayResult();
+									})
+								}
+							},
+						});
+					}
+				});
+			},
 
 			// 开始准备轮询
 			handlePayResult() {
@@ -550,7 +505,7 @@
 			//展期延长需要付费的金额
 			getCommodityExtendShowTimeCost() {
 				let paramsData = {
-					id: this.id,
+					id: this.commodity.id,
 					endShowTime: regexDateStringToTimestamp(this.extendedDate + "T00:00:00"),
 				}
 				let self = this;

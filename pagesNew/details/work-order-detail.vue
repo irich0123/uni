@@ -224,8 +224,8 @@
 	// #ifdef APP-PLUS
 	import UniShare from '@/components/uni-share/js_sdk/uni-share.js';
 	import {
-		h5WebUrl
-	} from '@/utils/config';
+		getInfoPageShareConfigApp
+	} from '@/api/wx_api.js';
 	const uniShare = new UniShare();
 	// #endif
 
@@ -385,9 +385,8 @@
 		methods: {
 			navAction(e) {
 				if (e.action === 'back') {
-					let pages = getCurrentPages();
-					if (pages.length < 2) {
-						uni.switchTab({
+					if (!!this.directOpen) {
+						uni.reLaunch({
 							url: '/pages/index/index',
 						})
 					} else {
@@ -552,7 +551,7 @@
 					uni.showToast({
 						title: '此信息未生效或已失效！',
 						icon: "none",
-						duration: 1000
+						duration: 3000
 					})
 					setTimeout(() => {
 						if (!this.directOpen) {
@@ -560,11 +559,11 @@
 								delta: 1
 							});
 						} else {
-							uni.switchTab({
+							uni.reLaunch({
 								url: '/pages/index/index'
 							})
 						}
-					}, 1000)
+					}, 3000)
 				} else {
 					if (!!workOrder.img) {
 						workOrder.img = JSON.parse(workOrder.img);
@@ -593,7 +592,7 @@
 
 					this.workOrder = workOrder;
 
-					if (this.directOpen === 's') { //由点击分享信息而来
+					if (!!this.directOpen) { //由点击分享信息而来
 						// #ifdef H5
 						this.isShowFab = true
 						// #endif
@@ -785,22 +784,33 @@
 							return;
 						}
 
-						let img = (self.workOrder.img.length === 0) ? (self.imgUrl + '/login/logo.png') : self
-							.workOrder.img[0];
-						uniShare.show({
-							content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
-								type: 0,
-								href: h5WebUrl + 'pagesNew/details/workDetails?id=' + self.workOrder
-									.id,
-								title: self.workOrder.title,
-								summary: '找加工厂就用云加工',
-								imageUrl: img,
-							},
-							menus: menu,
-							cancelText: "取消分享",
-						}, e => { //callback
-							console.log(e);
-						})
+						getInfoPageShareConfigApp({
+							pageType: 1, // 0= 外发，1=承接 
+							infoId: self.workOrder.id,
+						}).then(res => {
+							if (res.retCode === 0) {
+								let result = res.data;
+								uniShare.show({
+									content: { //公共的分享参数配置  类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
+										type: 5, //分享到小程序
+										miniProgram: {
+											id: "gh_fff781253752",
+											path: result.path,
+											type: 0,
+											webUrl: result.url,
+										},
+										imageUrl: result.icon,
+										href: result.url,
+										title: result.title,
+										summary: '没活干就上云加工',
+									},
+									menus: menu,
+									cancelText: "取消分享",
+								}, e => { //callback
+									console.log(e);
+								})
+							}
+						});
 					},
 				});
 			}

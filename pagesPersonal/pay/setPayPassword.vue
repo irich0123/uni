@@ -34,8 +34,8 @@
 							placeholderStyle="color: #cccccc" id="smsCode" type="number" @blur="submitBtnValid" />
 					</view>
 
-					<button class="flex align-center justify-center text-sm bg-theme radius-s color-white" style="padding: 6rpx 24rpx;"
-						@click="requestCode" :disabled="disabled">{{ codeText }}</button>
+					<button class="flex align-center justify-center text-sm bg-theme radius-s color-white"
+						style="padding: 6rpx 24rpx;" @click="requestCode" :disabled="disabled">{{ codeText }}</button>
 				</view>
 
 				<number-keyboard ref='keyboard' v-model="value" @input='onInput'
@@ -43,7 +43,8 @@
 			</view>
 
 			<view class="margin-lr-sm margin-tb-sm">
-				<button class="login flex align-center justify-center text-xl bg-theme color-white margin-lr" @click="submitPassword" :disabled="btnDisable">{{ buttonValue }}</button>
+				<button class="login flex align-center justify-center text-xl bg-theme color-white margin-lr"
+					@click="submitPassword" :disabled="btnDisable">{{ buttonValue }}</button>
 			</view>
 		</scroll-view>
 	</view>
@@ -57,7 +58,8 @@
 	} from "@/api/api";
 	import {
 		regex,
-		publicKey,active
+		publicKey,
+		active
 	} from "@/utils/config";
 	import {
 		setPassword
@@ -65,7 +67,7 @@
 	// #ifndef H5
 	import myNavBar from '@/components/my-nav-bar/my-nav-bar.vue';
 	// #endif
-	
+
 	const jsEncrypt = require('@/utils/jsencrypt')
 	let jse = new jsEncrypt.JSEncrypt();
 	jse.setPublicKey(publicKey) //配置公钥
@@ -110,7 +112,7 @@
 				disabled: false,
 
 				plaintext: true,
-				
+
 				statusbarHeight: 0,
 				contentTop: 0,
 				listHeight: 0,
@@ -302,19 +304,18 @@
 </script>
 
 <style scoped lang="scss">
-	
 	.login {
 		height: 90rpx;
 		border-radius: 50rpx;
 		letter-spacing: 2rpx;
 		border: 0;
 	}
-	
+
 	.login[disabled] {
 		color: #cccccc;
 		background: #fff;
 	}
-	
+
 	.container {
 		width: 100%;
 		height: 100%;

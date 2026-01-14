@@ -13,7 +13,7 @@ export const myRequest = (options) => {
 
 	// #ifdef APP-PLUS
 	options.header["appversion"] = plus.runtime.version; //苹果Hyper版本号
-	options.header["deviceType"] = uni.getStorageSync("platform"); //android(0), ios(1), js(2);
+	options.header["deviceType"] = uni.getStorageSync("platform"); //android(0), ios(1), js(2), harmonyOs(3);
 	options.header["deviceInfo"] = uni.getStorageSync("deviceInfo");
 	// #endif
 	// #ifdef H5 || MP-WEIXIN

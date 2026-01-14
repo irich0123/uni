@@ -43,6 +43,8 @@ export const initApp = () => {
 		_getCommodityStatusList();
 		uni.setStorageSync("basicDataTime", new Date().getTime());
 	}
+
+	_initPlatform();
 }
 
 const _getActionConsumeList = () => {
@@ -93,4 +95,10 @@ const _getCommodityStatusList = () => {
 			uni.setStorageSync("commodityStatusList", res.data);
 		}
 	});
+}
+
+const _initPlatform = () => {
+	let info = uni.getSystemInfoSync();
+	uni.setStorageSync("platform", info.platform);
+	uni.setStorageSync("theme", info.osTheme === 'light' ? 1 : 0);
 }

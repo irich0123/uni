@@ -30,7 +30,6 @@ class Iap {
 		return new Promise((resolve, reject) => {
 			this.getChannels((channel) => {
 				this._ready = true;
-				// console.log("channel==",channel);
 				resolve(channel);
 			}, (err) => {
 				reject(err);
@@ -59,6 +58,7 @@ class Iap {
 					resolve(res);
 				},
 				fail: (err) => {
+					console.log(err);
 					reject(err);
 				}
 			});
@@ -108,6 +108,7 @@ class Iap {
 					return (channel.id === 'appleiap')
 				})
 
+				console.log("_channel",this._channel);
 				if (this._channel) {
 					success(this._channel)
 				} else {
